@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SRM DevArena — Lead Developer & Admin Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <!-- ============================= Security Gate ============================= -->
+  <div class="admin-gate-overlay" id="adminGateOverlay">
+    <div class="gate-card">
+      <span class="admin-badge" style="margin-bottom:12px; display:inline-block;">DEV / ADMIN ROOT</span>
+      <h2>Administrator Access</h2>
+      <p>Enter your master administrative key to manage faculty access credentials.</p>
+
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <input type="password" id="adminGatePass" placeholder="Master admin password" />
+        <div id="gateError" style="color:#ff5555; font-size:0.75rem; min-height:1em;"></div>
+        <button type="button" class="btn-white" id="adminGateSubmit">Unlock Console</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= Top Header ============================= -->
+  <header class="admin-header">
+    <div class="admin-brand">
+      <span class="admin-badge">ADMIN</span>
+      <span class="admin-title">DevArena System Control</span>
+      <span class="admin-meta">· Shraddha Kondaveeti (Lead Dev)</span>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <button type="button" class="admin-nav-link" id="purgeCacheBtn" style="cursor:pointer;">Purge System Cache</button>
+      <a href="../index.html" class="admin-nav-link">← Return to Portal</a>
+    </div>
+  </header>
+
+  <!-- ============================= Admin Layout ============================= -->
+  <main class="admin-layout">
+
+    <!-- Stats Banner -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="label">Approved Faculty</div>
+        <div class="value" id="statFacultyCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Active Tracks</div>
+        <div class="value" id="statTrackCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total Challenges</div>
+        <div class="value" id="statChallengeCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Persistence Engine</div>
+        <div class="value" style="font-size:1.15rem; color:#888;">LocalStorage</div>
+      </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="admin-grid">
+
+      <!-- Left: Approved Faculty List & Password Vault -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Approved Faculty &amp; Credentials Vault</h2>
+          <span style="font-size:0.72rem; color:var(--admin-text-muted); font-family:var(--font-mono);">SYNCED WITH LIVE PORTAL</span>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="faculty-table">
+            <thead>
+              <tr>
+                <th>Faculty Member</th>
+                <th>SRM Email</th>
+                <th>Login Password</th>
+                <th>Managed Tracks</th>
+                <th style="text-align:right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="facultyTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Right: Provision New Faculty Account -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Provision New Faculty</h2>
+        </div>
+
+        <form class="admin-form" id="addFacultyForm">
+          <div class="form-group">
+            <label for="newFacultyName">Full Name</label>
+            <input type="text" id="newFacultyName" placeholder="e.g. Dr. K. Rajesh" required />
+          </div>
+
+          <div class="form-group">
+            <label for="newFacultyTitle">Title / Designation</label>
+            <input type="text" id="newFacultyTitle" placeholder="e.g. Associate Professor, CSE" required />
+          </div>
+
+          <div class="form-group">
+            <label for="newFacultyEmail">Official University Email</label>
+            <input type="email" id="newFacultyEmail" placeholder="rajesh.k@srmap.edu.in" required />
+          </div>
+
+          <div class="form-group">
+            <label for="newFacultyPassword">Assigned Login Password</label>
+            <input type="text" id="newFacultyPassword" placeholder="e.g. rajesh@srm2026" required style="font-family:var(--font-mono);" />
+          </div>
+
+          <button type="submit" class="btn-white" style="margin-top:8px;">+ Grant Faculty Access</button>
+        </form>
+      </section>
+
+    </div>
+
+  </main>
+
+  <div class="admin-toast" id="adminToast"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

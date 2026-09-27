@@ -1,0 +1,395 @@
+/* ==========================================================================
+   SRM DevArena — ADMIN CONSOLE THEME (admin/admin.css)
+   Black, Grey & White Theme with Softened Rounded Architecture
+   ========================================================================== */
+
+:root {
+  --admin-bg: #060607;
+  --admin-surface: #111113;
+  --admin-surface-card: #161619;
+  --admin-surface-hover: #1e1e22;
+  --admin-border: #27272a;
+  --admin-border-strong: #3f3f46;
+  --admin-text-white: #ffffff;
+  --admin-text-muted: #a1a1aa;
+  --admin-text-faint: #52525b;
+  --admin-accent-white: #fafafa;
+
+  --font-mono: "IBM Plex Mono", Consolas, monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--admin-bg);
+  color: var(--admin-text-white);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.admin-header {
+  height: 68px;
+  background: var(--admin-surface);
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-badge {
+  background: var(--admin-text-white);
+  color: var(--admin-bg);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.05em;
+}
+
+.admin-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.admin-meta {
+  font-size: 0.8rem;
+  color: var(--admin-text-muted);
+}
+
+.admin-nav-link {
+  color: var(--admin-text-muted);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border: 1px solid var(--admin-border);
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  transition: all 0.15s ease;
+}
+
+.admin-nav-link:hover {
+  background: var(--admin-surface-hover);
+  color: #fff;
+  border-color: var(--admin-border-strong);
+}
+
+/* Layout */
+.admin-layout {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 32px 32px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Stat Grid */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.stat-card .label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stat-card .value {
+  font-family: var(--font-mono);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--admin-text-white);
+  margin-top: 4px;
+}
+
+/* Main Split View */
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.panel {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.panel-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Faculty Table */
+.faculty-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.faculty-table th {
+  text-align: left;
+  padding: 12px 20px;
+  background: #0d0d0f;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.faculty-table td {
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--admin-border);
+  vertical-align: middle;
+}
+
+.faculty-table tr:last-child td {
+  border-bottom: none;
+}
+
+.faculty-table tr:hover {
+  background: var(--admin-surface-hover);
+}
+
+.faculty-name {
+  font-weight: 600;
+  color: #fff;
+}
+
+.faculty-sub {
+  font-size: 0.74rem;
+  color: var(--admin-text-muted);
+}
+
+.password-cell {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  background: #09090b;
+  padding: 5px 10px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.btn-icon:hover { color: #fff; }
+
+.track-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  background: #1c1c20;
+  border: 1px solid var(--admin-border-strong);
+  color: #e4e4e7;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  margin: 2px 4px 2px 0;
+}
+
+/* Form Styles */
+.admin-form {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.form-group input {
+  background: #09090b;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-group input:focus {
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.btn-white {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 11px 20px;
+  font-weight: 600;
+  font-size: 0.86rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.05s ease;
+}
+.btn-white:hover { opacity: 0.9; }
+.btn-white:active { transform: translateY(1px); }
+
+.btn-danger-outline {
+  background: transparent;
+  color: var(--admin-text-muted);
+  border: 1px solid var(--admin-border);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-danger-outline:hover {
+  color: #ff5555;
+  border-color: #ff5555;
+  background: rgba(255, 85, 85, 0.08);
+}
+
+/* Password Gate Modal */
+.admin-gate-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+.admin-gate-overlay[hidden] { display: none; }
+
+.gate-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+}
+
+.gate-card h2 {
+  font-size: 1.3rem;
+  margin: 0 0 6px;
+}
+
+.gate-card p {
+  color: var(--admin-text-muted);
+  font-size: 0.84rem;
+  margin: 0 0 20px;
+}
+
+.gate-card input {
+  background: #09090b;
+  border: 1px solid var(--admin-border);
+  color: #fff;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  text-align: center;
+  outline: none;
+}
+.gate-card input:focus {
+  border-color: #fff;
+}
+
+/* Toast */
+.admin-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #fff;
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 11px 20px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 9999;
+}
+.admin-toast.visible { opacity: 1; }
+
+@media (max-width: 900px) {
+  .admin-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-layout { padding: 20px 16px 60px; }
+}

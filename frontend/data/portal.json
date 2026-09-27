@@ -1,0 +1,63 @@
+{
+  "university": "SRM University-AP",
+  "platform": "SRM DevArena",
+  "conversionScale": 0.25,
+  "maxUniversityMarks": 25,
+  "years": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+  "faculties": [
+    {
+      "id": "yasir",
+      "name": "Dr. Yasir Afaq",
+      "title": "Assistant Professor, CSE",
+      "email": "yasir.a@srmap.edu.in",
+      "password": "yasir@srm123",
+      "role": "faculty",
+      "tracks": [
+        {
+          "id": "code2think",
+          "name": "Code2Think",
+          "year": "1st Year",
+          "description": "Foundational problem-solving track for first-year engineers.",
+          "challenges": [
+            {
+              "id": "c2t-01",
+              "title": "Reverse the Digits",
+              "points": 10,
+              "assignedDate": "2026-09-08",
+              "deadline": "2026-09-12T23:59",
+              "isActive": true,
+              "statement": "Read a single integer N and print its digits in reverse order. Negative numbers should keep the sign on the left and reverse only the magnitude.",
+              "constraints": {
+                "timeLimitMs": 1000,
+                "memoryLimitMb": 64,
+                "ioRules": "Read one integer from standard input. Print reversed integer."
+              },
+              "sampleTests": [
+                { "input": "12345", "expectedOutput": "54321" },
+                { "input": "-820", "expectedOutput": "-028" }
+              ]
+            },
+            {
+              "id": "c2t-02",
+              "title": "Prime Sieve Counter",
+              "points": 10,
+              "assignedDate": "2026-09-13",
+              "deadline": "2026-09-17T23:59",
+              "isActive": true,
+              "statement": "Given an integer N, count how many prime numbers exist in the range [2, N] using a sieve-based approach.",
+              "constraints": {
+                "timeLimitMs": 1500,
+                "memoryLimitMb": 64,
+                "ioRules": "Read integer N. Print prime count."
+              },
+              "sampleTests": [
+                { "input": "10", "expectedOutput": "4" },
+                { "input": "1", "expectedOutput": "0" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SRM DevArena — Cohort Leaderboard & Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/leaderboard.css" />
+</head>
+<body data-page="leaderboard">
+
+  <!-- ============================= Topbar Header ============================= -->
+  <header class="app-header">
+    <div class="brand">
+      <img src="assets/srmaplogo.png" alt="SRM University-AP seal" class="brand-seal" />
+      <div class="brand-copy">
+        <div class="brand-name">SRM DevArena</div>
+        <div class="brand-sub">SRM University-AP · Academic Coding Portal</div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <nav class="site-nav">
+        <a href="index.html">Workspace</a>
+        <a href="leaderboard.html" class="active">Leaderboard</a>
+      </nav>
+
+      <div class="marks-chip" id="marksChip">
+        <span class="marks-primary font-mono" id="headerMarksPrimary">Converted Marks: — / — Marks</span>
+        <span class="marks-secondary font-mono" id="headerMarksSecondary" hidden>— raw points</span>
+      </div>
+
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+
+      <div class="profile-badge" id="profileBadge" hidden>
+        <div class="profile-avatar" id="profileAvatar">—</div>
+        <div class="profile-meta">
+          <div class="profile-name" id="profileName">—</div>
+          <div class="profile-track" id="profileTrack">—</div>
+        </div>
+        <button class="profile-menu-btn" id="profileMenuBtn" aria-label="Account menu">▾</button>
+        <div class="profile-dropdown" id="profileDropdown">
+          <button onclick="localStorage.removeItem('devarena.session'); window.location.href='index.html';">Switch Track</button>
+          <button id="logoutBtn" class="danger-item">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================= Main Content ============================= -->
+  <main class="leaderboard-layout">
+
+    <div class="leaderboard-head">
+      <div>
+        <h1 class="page-title" id="leaderboardTitle">Cohort Leaderboard</h1>
+        <p class="page-desc" id="leaderboardSubtitle">Official university rankings aggregated by internal marks.</p>
+      </div>
+
+      <!-- Filter pills: rendered exclusively for faculty; completely hidden for students -->
+      <div class="track-filter" id="trackFilter" role="toolbar" aria-label="Filter leaderboard by challenge track"></div>
+    </div>
+
+    <!-- 4-Stat Metric Summary Strip -->
+    <div class="summary-strip" id="summaryStrip"></div>
+
+    <!-- Pinned User Standing Card (Students only) -->
+    <div class="card card--highlight" id="userStandingBanner" hidden>
+      <div class="highlight-info">
+        <span class="highlight-badge">Your Standing</span>
+        <span class="highlight-rank font-mono" id="bannerRank">Rank #--</span>
+        <span class="highlight-track" id="bannerTrack">—</span>
+      </div>
+      <div class="highlight-metrics">
+        <span>Completed: <strong class="font-mono" id="bannerCompleted">--</strong> Challenges</span>
+        <span>Converted Marks: <strong class="font-mono" id="bannerMarks">-- / --</strong> Marks</span>
+      </div>
+    </div>
+
+    <!-- Leaderboard Layout: Adaptable single or two-column depending on role -->
+    <div class="leaderboard-grid" id="leaderboardGrid">
+
+      <!-- Cohort Rankings Table -->
+      <section class="rank-table-card">
+        <div class="card-header">
+          <h2 class="section-title">Cohort Standings</h2>
+          <span class="text-faint text-xs font-mono" id="tableFilterLabel">Enrolled Track</span>
+        </div>
+        <div class="table-container">
+          <table class="rank-table" aria-label="Cohort Leaderboard Standings">
+            <thead>
+              <tr>
+                <th scope="col" style="width: 54px; text-align: center;">Rank</th>
+                <th scope="col">Student</th>
+                <th scope="col">Track</th>
+                <th scope="col" style="text-align: right;">University Marks</th>
+              </tr>
+            </thead>
+            <tbody id="rankTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Student Performance Trend Graph (Hidden for faculty) -->
+      <section class="graph-card" id="studentPerformanceCard">
+        <div class="card-header">
+          <h2 class="section-title">Performance Trend</h2>
+          <span class="text-xs text-muted" id="graphTrackIndicator">My Trajectory</span>
+        </div>
+
+        <div class="graph-body">
+          <p class="graph-meta">Progressive university marks trajectory over active challenge schedule:</p>
+          <div class="dark-graph-container">
+            <div id="performanceGraph" class="svg-container"></div>
+            <div class="dark-graph-tooltip" id="graphTooltip" role="tooltip" aria-hidden="true"></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

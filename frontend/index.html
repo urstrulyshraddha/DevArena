@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SRM DevArena — Academic Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="index">
+
+  <!-- ============================= Topbar Header ============================= -->
+  <header class="app-header">
+    <div class="brand">
+      <img src="assets/srmaplogo.png" alt="SRM University-AP seal" class="brand-seal" />
+      <div class="brand-copy">
+        <div class="brand-name">SRM DevArena</div>
+        <div class="brand-sub">SRM University-AP · Academic Coding Portal</div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <nav class="site-nav">
+        <a href="index.html" class="active">Workspace</a>
+        <a href="leaderboard.html">Leaderboard</a>
+      </nav>
+
+      <div class="marks-chip" id="marksChip">
+        <span class="marks-primary font-mono" id="headerMarksPrimary">Converted Marks: — / — Marks</span>
+        <span class="marks-secondary font-mono" id="headerMarksSecondary" hidden>— raw points</span>
+      </div>
+
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+
+      <div class="profile-badge" id="profileBadge" hidden>
+        <div class="profile-avatar" id="profileAvatar">—</div>
+        <div class="profile-meta">
+          <div class="profile-name" id="profileName">—</div>
+          <div class="profile-track" id="profileTrack">—</div>
+        </div>
+        <button class="profile-menu-btn" id="profileMenuBtn" aria-label="Account menu">▾</button>
+        <div class="profile-dropdown" id="profileDropdown">
+          <button id="switchTrackBtn" onclick="localStorage.removeItem('devarena.session'); window.location.reload();">Switch Track</button>
+          <button id="logoutBtn" class="danger-item">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================= Onboarding Modal ============================= -->
+  <div class="modal-overlay" id="onboardingOverlay">
+    <div class="onboarding-card">
+      <div class="onboarding-head">
+        <div class="onboarding-eyebrow-row">
+          <img src="assets/srmaplogo.png" alt="" width="28" height="28" style="border-radius:50%;" />
+          <span style="font-size:0.78rem;color:var(--text-muted);">SRM University-AP Gateway</span>
+        </div>
+        <h2>Welcome to DevArena</h2>
+        <p>Sign in with your university credentials to enter your workspace.</p>
+      </div>
+
+      <div class="role-tabs">
+        <button type="button" class="role-tab active" data-role="student">Student</button>
+        <button type="button" class="role-tab" data-role="faculty">Faculty</button>
+      </div>
+
+      <form class="onboarding-form" id="onboardingForm" novalidate>
+        <div class="form-banner" id="formBanner"></div>
+
+        <!-- Student fields -->
+        <div id="studentFields">
+          <div class="field">
+            <label for="nameInput">Full name</label>
+            <input type="text" id="nameInput" placeholder="e.g. K. Varun Teja" autocomplete="name" />
+            <div class="field-error" id="nameError"></div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="regNoInput">University Reg No</label>
+              <input type="text" id="regNoInput" placeholder="AP21110010045" />
+              <div class="field-error" id="regNoError"></div>
+            </div>
+            <div class="field">
+              <label for="emailInput">SRM Email</label>
+              <input type="email" id="emailInput" placeholder="yourname@srmap.edu.in" autocomplete="email" />
+              <div class="field-error" id="emailError"></div>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="yearSelect">Academic Year</label>
+              <select id="yearSelect"></select>
+              <div class="field-error" id="yearError"></div>
+            </div>
+            <div class="field">
+              <label for="mentorSelect">Faculty Mentor</label>
+              <select id="mentorSelect"></select>
+              <div class="field-error" id="mentorError"></div>
+            </div>
+          </div>
+
+          <div class="route-preview" id="routePreview">
+            <span id="routePreviewText"></span>
+          </div>
+        </div>
+
+        <!-- Faculty fields with Password Gate -->
+        <div id="facultyFields" hidden>
+          <div class="field">
+            <label for="facultySelectField">Your Approved Account</label>
+            <select id="facultySelectField"></select>
+            <div class="field-error" id="facultySelectError"></div>
+          </div>
+          <div class="field">
+            <label for="facultyEmailInput">SRM Email</label>
+            <input type="email" id="facultyEmailInput" placeholder="name@srmap.edu.in" autocomplete="email" />
+            <div class="field-error" id="facultyEmailError"></div>
+          </div>
+          <div class="field">
+            <label for="facultyPasswordInput">Access Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="facultyPasswordInput" placeholder="Enter secure password" autocomplete="current-password" />
+              <button type="button" id="togglePasswordBtn" class="password-toggle-btn" aria-label="Toggle password visibility">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+            <div class="field-error" id="facultyPasswordError"></div>
+          </div>
+          <p class="field-hint">Access is restricted to authorized faculty members and administrators.</p>
+        </div>
+
+        <div class="onboarding-actions">
+          <button type="submit" class="btn btn-primary btn-block">Enter DevArena</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================= STUDENT WORKSPACE ============================= -->
+  <main class="workspace-shell" id="workspaceShell" hidden>
+    <div class="workspace-layout">
+
+      <section class="track-banner">
+        <div class="track-banner-copy">
+          <div class="eyebrow">Your Enrolled Track</div>
+          <h1 id="trackBannerName">—</h1>
+          <p id="trackBannerDesc">—</p>
+          <p id="trackBannerMentor" style="margin-top:4px;font-size:0.78rem;"></p>
+        </div>
+      </section>
+
+      <!-- Left Column: Challenges & Stepper -->
+      <aside class="workspace-left">
+        <div class="challenge-list-card card">
+          <div class="card-header"><h3>Challenges</h3></div>
+          <div id="challengeList"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 id="activeChallengeTitle">—</h3>
+            <span class="challenge-item-points font-mono" id="activeChallengePoints"></span>
+          </div>
+          <div class="card-body">
+            <ul class="stepper" id="stepper"></ul>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Column: Specs, Code Editor, Test Runs, & Reflection -->
+      <section class="workspace-right">
+        <!-- Specs & Guidelines -->
+        <div class="card">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="problemStatementPanel">Problem Statement</button>
+            <button class="tab-btn" data-tab="guidelinesPanel">Execution Guidelines</button>
+          </div>
+
+          <div class="tab-panel active" id="problemStatementPanel">
+            <p class="statement-text" id="statementText">—</p>
+          </div>
+
+          <div class="tab-panel" id="guidelinesPanel">
+            <div class="guideline-grid">
+              <div class="guideline-stat"><div class="value font-mono" id="timeLimitStat">—</div><div class="label">Time Limit</div></div>
+              <div class="guideline-stat"><div class="value font-mono" id="memoryLimitStat">—</div><div class="label">Memory Limit</div></div>
+              <div class="guideline-stat"><div class="value font-mono" id="pointsStat">—</div><div class="label">Max Marks</div></div>
+            </div>
+            <p class="io-rules" id="ioRulesText">—</p>
+          </div>
+        </div>
+
+        <!-- Code Editor with Language Selector (C, C++, Python, Java) -->
+        <div class="card">
+          <div class="card-header">
+            <div style="display:flex; align-items:center; gap: 12px;">
+              <h3>Code Solution</h3>
+              <div class="lang-select-wrap">
+                <select id="langSelect" aria-label="Programming Language">
+                  <option value="c">C (gcc 11)</option>
+                  <option value="cpp">C++ (g++ 20)</option>
+                  <option value="python">Python 3.10</option>
+                  <option value="java">Java 17</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="editor-toolbar">
+              <button type="button" class="btn btn-outline btn-sm file-btn">
+                <span id="uploadCodeBtnLabel">Upload File</span>
+                <input type="file" id="codeFileInput" accept=".c,.cpp,.py,.java" />
+              </button>
+              <button type="button" class="btn btn-forest btn-sm" id="runSampleTestsBtn">
+                ▶ Run Sample Tests
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <textarea class="code-editor" id="codeEditor" spellcheck="false"></textarea>
+
+            <!-- Test Cases Runner Console -->
+            <div class="test-run-console" id="testRunConsole">
+              <div class="test-run-console__header">
+                <span class="test-run-console__title">Sample Test Cases</span>
+                <span class="test-run-console__badge" id="testRunSummaryBadge">Ready</span>
+              </div>
+              <div class="test-run-cases" id="testRunResultsList"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reflection Card: Written Notes + Strict PDF Upload -->
+                <div class="card">
+                  <div class="card-header">
+                    <div>
+                      <h3>Reflection</h3>
+                      <p class="text-xs text-muted" style="margin:2px 0 0;">Provide your conceptual approach and attach an optional PDF document.</p>
+                    </div>
+                    <div class="editor-toolbar">
+                      <button type="button" class="btn btn-outline btn-sm file-btn">
+                        📎 Upload .pdf Document
+                        <input type="file" id="pdfFileInput" accept=".pdf,application/pdf" />
+                      </button>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <textarea class="reflection-area" id="reflectionArea" placeholder="Explain your design thinking, edge cases handled, or where you ran into bottlenecks..."></textarea>
+                    <div id="reflectionFileChipWrap" style="margin-top: 8px;" hidden>
+                      <span class="file-chip" id="reflectionFileChip"></span>
+                      <button type="button" id="removePdfBtn" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.8rem; margin-left:6px;">✕ Remove</button>
+                    </div>
+
+                    <div class="submission-actions" id="submissionActions" style="margin-top: 16px;">
+                      <button class="btn btn-primary" id="submitBtn">Submit Solution &amp; Reflection</button>
+                      <div id="reReviewWrap"></div>
+                    </div>
+                  </div>
+                </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ============================= FACULTY WORKSPACE ============================= -->
+  <main class="faculty-shell" id="facultyShell" hidden>
+    <div class="faculty-layout">
+
+      <section class="faculty-banner">
+        <div class="faculty-banner__info">
+          <div class="eyebrow" id="facultyGreeting">Faculty Oversight Console</div>
+          <h1 id="facultyBannerName">—</h1>
+          <p id="facultyBannerTitle">—</p>
+        </div>
+
+        <div class="faculty-track-controls">
+          <div class="track-select-group">
+            <label for="facultyTrackSelect" class="text-xs" style="color: rgba(255,255,255,0.7); font-weight:600;">ACTIVE CHALLENGE TRACK:</label>
+            <select id="facultyTrackSelect" class="faculty-select"></select>
+          </div>
+          <button type="button" class="btn btn-forest" id="openCreateTrackModalBtn">+ Create Challenge Track</button>
+        </div>
+      </section>
+
+      <div class="faculty-grid">
+        <aside class="faculty-left">
+          <div class="card">
+            <div class="card-header" style="justify-content: space-between;">
+              <div>
+                <h3>Tasks in Track</h3>
+                <span class="text-xs text-muted" id="facultyChallengeCount">—</span>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" id="openCreateTaskModalBtn">+ New Task</button>
+            </div>
+            <div id="facultyChallengeList"></div>
+          </div>
+
+          <div class="card card--alert" id="facultyReReviewCard">
+            <div class="card-header">
+              <h3>Student Re-Review Requests</h3>
+            </div>
+            <div class="card-body" id="facultyReReviewList">
+              <p class="text-xs text-muted">No pending re-review requests.</p>
+            </div>
+          </div>
+        </aside>
+
+        <section class="faculty-right">
+          <div class="card">
+            <div class="card-header faculty-task-header">
+              <div>
+                <h3 id="facultySelectedChallengeTitle">—</h3>
+                <p class="text-xs text-muted" id="facultySelectedChallengeSub">—</p>
+              </div>
+
+              <div class="task-ops">
+                <div class="deadline-pill">
+                  <label for="taskDeadlineInput">Deadline:</label>
+                  <input type="datetime-local" id="taskDeadlineInput" class="deadline-input" />
+                  <button type="button" class="btn btn-outline btn-sm" id="saveDeadlineBtn">Save</button>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm" id="triggerAiReviewBtn">
+                  ⚡ Trigger Automated AI Review
+                </button>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="rank-table faculty-table">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Status / Stage</th>
+                    <th>Submitted</th>
+                    <th>Attached PDF</th>
+                    <th style="text-align:right;">Awarded Marks</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="facultySubmissionsBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" id="facultyReviewDrawer" hidden>
+            <div class="card-header">
+              <h3 id="inspectStudentName">Student Code &amp; Reflection Inspect</h3>
+              <button type="button" class="btn btn-outline btn-sm" id="closeDrawerBtn">Close</button>
+            </div>
+            <div class="card-body">
+              <div class="field">
+                <label>Submitted Code:</label>
+                <textarea class="code-editor" id="inspectCode" readonly style="min-height: 180px;"></textarea>
+              </div>
+              <div class="field" style="margin-top: 12px;">
+                <label>Attached Reflection File:</label>
+                <span class="file-chip" id="inspectPdfChip"></span>
+              </div>
+              <div class="submission-actions" style="margin-top: 14px;">
+                <div style="display:flex; align-items:center; gap: 8px;">
+                  <label for="facultyGradeInput" style="font-size:0.82rem; font-weight:600;">Assign Raw Points (0-10):</label>
+                  <input type="number" id="facultyGradeInput" min="0" max="10" step="0.5" style="width: 80px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border);" />
+                </div>
+                <button type="button" class="btn btn-forest btn-sm" id="facultySaveGradeBtn">Approve &amp; Evaluate</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ============================= MODAL: CREATE TRACK ============================= -->
+  <div class="modal-overlay" id="createTrackModal" hidden>
+    <div class="onboarding-card">
+      <div class="onboarding-head">
+        <h2>Create Challenge Track</h2>
+        <p>Design a cohort track for a specific academic year (e.g. Code2Grow).</p>
+      </div>
+      <form class="onboarding-form" id="createTrackForm">
+        <div class="field">
+          <label for="newTrackName">Track Name</label>
+          <input type="text" id="newTrackName" placeholder="e.g. Code2Grow" required />
+        </div>
+        <div class="field">
+          <label for="newTrackYear">Target Academic Year</label>
+          <select id="newTrackYear" required></select>
+        </div>
+        <div class="field">
+          <label for="newTrackDesc">Short Description</label>
+          <textarea id="newTrackDesc" rows="2" placeholder="e.g. Intermediate algorithms and data structures..." required></textarea>
+        </div>
+        <div class="mini-dialog-actions">
+          <button type="button" class="btn btn-outline btn-sm" id="closeCreateTrackBtn">Cancel</button>
+          <button type="submit" class="btn btn-forest btn-sm">Create Track</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================= MODAL: CREATE TASK ============================= -->
+  <div class="modal-overlay" id="createTaskModal" hidden>
+    <div class="onboarding-card" style="max-width: 620px;">
+      <div class="onboarding-head">
+        <h2>Add New Task / Challenge</h2>
+        <p>Schedule a new problem for the active track with specific deadlines.</p>
+      </div>
+      <form class="onboarding-form" id="createTaskForm">
+        <div class="field">
+          <label for="newTaskTitle">Task Title</label>
+          <input type="text" id="newTaskTitle" placeholder="e.g. Binary Search Tree Insertion" required />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="newTaskPoints">Raw Points</label>
+            <input type="number" id="newTaskPoints" value="10" min="1" max="100" required />
+          </div>
+          <div class="field">
+            <label for="newTaskDeadline">Submission Deadline</label>
+            <input type="datetime-local" id="newTaskDeadline" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="newTaskStatement">Problem Statement</label>
+          <textarea id="newTaskStatement" rows="3" placeholder="Describe the task specifications and expected behavior..." required></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="newTaskInput">Sample Input</label>
+            <textarea id="newTaskInput" rows="2" placeholder="5&#10;10 20 30 40 50" required></textarea>
+          </div>
+          <div class="field">
+            <label for="newTaskOutput">Expected Output</label>
+            <textarea id="newTaskOutput" rows="2" placeholder="Found: 30" required></textarea>
+          </div>
+        </div>
+
+        <div class="mini-dialog-actions">
+          <button type="button" class="btn btn-outline btn-sm" id="closeCreateTaskBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Add Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================= Re-Review Dialog ============================= -->
+  <div class="mini-dialog-overlay" id="reReviewOverlay" hidden>
+    <div class="mini-dialog">
+      <h3>Request Faculty Re-Review</h3>
+      <p>Explain why your submission merits re-evaluation.</p>
+      <textarea id="reReviewJustification" placeholder="e.g. I handled the negative sign edge case correctly in my code…"></textarea>
+      <div class="mini-dialog-actions">
+        <button class="btn btn-outline btn-sm" id="reReviewCancelBtn">Cancel</button>
+        <button class="btn btn-danger-outline btn-sm" id="reReviewSubmitBtn">Submit Request</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
