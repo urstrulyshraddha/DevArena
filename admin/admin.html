@@ -11,22 +11,22 @@
 </head>
 <body>
 
-  <!-- ============================= Security Gate ============================= -->
+  <!-- Security Gate -->
   <div class="admin-gate-overlay" id="adminGateOverlay">
     <div class="gate-card">
       <span class="admin-badge" style="margin-bottom:12px; display:inline-block;">DEV / ADMIN ROOT</span>
       <h2>Administrator Access</h2>
-      <p>Enter your master administrative key to manage faculty access credentials.</p>
+      <p>Authenticate with master university administrator credentials.</p>
 
       <div style="display:flex; flex-direction:column; gap:12px;">
-        <input type="password" id="adminGatePass" placeholder="Master admin password" />
+        <input type="password" id="adminGatePass" placeholder="Master admin password" autocomplete="current-password" />
         <div id="gateError" style="color:#ff5555; font-size:0.75rem; min-height:1em;"></div>
         <button type="button" class="btn-white" id="adminGateSubmit">Unlock Console</button>
       </div>
     </div>
   </div>
 
-  <!-- ============================= Top Header ============================= -->
+  <!-- Header -->
   <header class="admin-header">
     <div class="admin-brand">
       <span class="admin-badge">ADMIN</span>
@@ -40,7 +40,7 @@
     </div>
   </header>
 
-  <!-- ============================= Admin Layout ============================= -->
+  <!-- Main Layout (Stacked Architecture) -->
   <main class="admin-layout">
 
     <!-- Stats Banner -->
@@ -59,82 +59,92 @@
       </div>
       <div class="stat-card">
         <div class="label">Persistence Engine</div>
-        <div class="value" style="font-size:1.15rem; color:#888;">LocalStorage</div>
+        <div class="value" style="font-size:1.15rem; color:#22c55e;">Google Sheets DB</div>
       </div>
     </div>
 
-    <!-- Main Workspace -->
-    <div class="admin-grid">
-
-      <!-- Left: Approved Faculty List & Password Vault -->
-      <section class="panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Approved Faculty &amp; Credentials Vault</h2>
-          <span style="font-size:0.72rem; color:var(--admin-text-muted); font-family:var(--font-mono);">SYNCED WITH LIVE PORTAL</span>
+    <!-- 1. TOP PANEL: Provision New Faculty Account & Multiple Sections -->
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Provision Faculty &amp; Allocate Cohorts</h2>
+          <span style="font-size:0.75rem; color:var(--admin-text-muted);">Allocate faculty to single or multiple academic years &amp; sections</span>
         </div>
+      </div>
 
-        <div style="overflow-x:auto;">
-          <table class="faculty-table">
-            <thead>
-                <tr>
-                  <th>Faculty Member</th>
-                  <th>SRM Email</th>
-                  <th>Account Status</th>
-                  <th>Managed Tracks</th>
-                  <th style="text-align:right;">Action</th>
-                </tr>
-            </thead>
-            <tbody id="facultyTableBody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Right: Provision New Faculty Account -->
-      <section class="panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Provision New Faculty</h2>
-        </div>
-
-        <form class="admin-form" id="addFacultyForm">
+      <form class="admin-form" id="addFacultyForm">
+        <!-- Faculty Primary Details -->
+        <div class="form-row-3">
           <div class="form-group">
             <label for="newFacultyName">Full Name</label>
             <input type="text" id="newFacultyName" placeholder="e.g. Dr. K. Rajesh" required />
           </div>
-
           <div class="form-group">
             <label for="newFacultyTitle">Title / Designation</label>
             <input type="text" id="newFacultyTitle" placeholder="e.g. Associate Professor, CSE" required />
           </div>
-
           <div class="form-group">
             <label for="newFacultyEmail">Official University Email</label>
             <input type="email" id="newFacultyEmail" placeholder="rajesh.k@srmap.edu.in" required />
           </div>
+        </div>
 
-          <div class="form-group">
-            <label for="newTrackName">Initial Track Name</label>
-            <input type="text" id="newTrackName" placeholder="e.g. Code2Think" required />
+        <!-- Dynamic Multi-Cohort Builder -->
+        <div class="cohorts-section">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <label style="font-family:var(--font-mono); font-size:0.75rem; color:var(--admin-text-muted); text-transform:uppercase;">
+              Assigned Cohorts &amp; Sections (Multi-Allocation)
+            </label>
+            <button type="button" class="btn-small-outline" id="addCohortRowBtn">+ Add Another Cohort</button>
           </div>
 
-          <div class="form-group">
-            <label for="newTrackSection">Section</label>
-            <input type="text" id="newTrackSection" placeholder="e.g. AIML-F or CS-C" required />
+          <div id="cohortRowsContainer" class="cohort-rows-wrap">
+            <!-- Initial Row -->
+            <div class="cohort-row">
+              <input type="text" class="cohort-track-name" placeholder="Track Name (e.g. Code2Think)" value="Code2Think" required />
+              <select class="cohort-year-select" required>
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="4th Year">4th Year</option>
+              </select>
+              <input type="text" class="cohort-section" placeholder="Section (e.g. AIML-F)" required />
+              <button type="button" class="btn-remove-cohort" title="Remove" style="visibility:hidden;">✕</button>
+            </div>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label for="newTrackYear">Academic Year</label>
-            <select id="newTrackYear" class="select"></select>
-          </div>
-
-          <p style="font-size:0.72rem; color:var(--admin-text-muted); margin:0;">
-            No password is set here. Faculty set their own password on first login (self-activation).
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; flex-wrap:wrap; gap:12px;">
+          <p style="font-size:0.75rem; color:var(--admin-text-muted); margin:0;">
+            No password is set here. Faculty configure their own password on first login via Users_Auth.
           </p>
+          <button type="submit" class="btn-white">+ Provision Faculty &amp; Sync Cohorts</button>
+        </div>
+      </form>
+    </section>
 
-          <button type="submit" class="btn-white" style="margin-top:8px;">+ Provision Faculty &amp; Track</button>
-        </form>
-      </section>
+    <!-- 2. BOTTOM PANEL: Full-Width Approved Faculty & Track Directory -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Approved Faculty &amp; Track Directory</h2>
+        <span style="font-size:0.72rem; color:var(--admin-text-muted); font-family:var(--font-mono);">LIVE GOOGLE SHEETS CATALOG</span>
+      </div>
 
-    </div>
+      <div style="overflow-x:auto;">
+        <table class="faculty-table">
+          <thead>
+            <tr>
+              <th>Faculty Member</th>
+              <th>SRM Email</th>
+              <th>Account Status</th>
+              <th>Managed Tracks</th>
+              <th style="text-align:right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="facultyTableBody"></tbody>
+        </table>
+      </div>
+    </section>
 
   </main>
 
