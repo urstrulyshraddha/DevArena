@@ -76,13 +76,13 @@
         <div style="overflow-x:auto;">
           <table class="faculty-table">
             <thead>
-              <tr>
-                <th>Faculty Member</th>
-                <th>SRM Email</th>
-                <th>Login Password</th>
-                <th>Managed Tracks</th>
-                <th style="text-align:right;">Action</th>
-              </tr>
+                <tr>
+                  <th>Faculty Member</th>
+                  <th>SRM Email</th>
+                  <th>Account Status</th>
+                  <th>Managed Tracks</th>
+                  <th style="text-align:right;">Action</th>
+                </tr>
             </thead>
             <tbody id="facultyTableBody"></tbody>
           </table>
@@ -112,11 +112,25 @@
           </div>
 
           <div class="form-group">
-            <label for="newFacultyPassword">Assigned Login Password</label>
-            <input type="text" id="newFacultyPassword" placeholder="e.g. rajesh@srm2026" required style="font-family:var(--font-mono);" />
+            <label for="newTrackName">Initial Track Name</label>
+            <input type="text" id="newTrackName" placeholder="e.g. Code2Think" required />
           </div>
 
-          <button type="submit" class="btn-white" style="margin-top:8px;">+ Grant Faculty Access</button>
+          <div class="form-group">
+            <label for="newTrackSection">Section</label>
+            <input type="text" id="newTrackSection" placeholder="e.g. AIML-F or CS-C" required />
+          </div>
+
+          <div class="form-group">
+            <label for="newTrackYear">Academic Year</label>
+            <select id="newTrackYear" class="select"></select>
+          </div>
+
+          <p style="font-size:0.72rem; color:var(--admin-text-muted); margin:0;">
+            No password is set here. Faculty set their own password on first login (self-activation).
+          </p>
+
+          <button type="submit" class="btn-white" style="margin-top:8px;">+ Provision Faculty &amp; Track</button>
         </form>
       </section>
 
@@ -126,6 +140,6 @@
 
   <div class="admin-toast" id="adminToast"></div>
 
-  <script src="admin.js"></script>
+  <script type="module" src="admin.js"></script>
 </body>
 </html>
