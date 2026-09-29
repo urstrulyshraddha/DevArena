@@ -157,15 +157,11 @@ async function boot() {
     }
 
     /* ── Admin (Pending Dedicated Admin Shell) ── */
-    if (activeSession.role === "admin") {
-      document.body.setAttribute("data-role", "admin");
-
-      if (studentShell) studentShell.setAttribute("hidden", "");
-      if (facultyShell) facultyShell.setAttribute("hidden", "");
-
-      showFatalError("Your admin account is authenticated, but the dedicated Admin Console UI is currently disabled.");
-      return;
-    }
+    /* ── Admin Routing ── */
+        if (activeSession.role === "admin") {
+          window.location.href = "admin/admin.html";
+          return;
+        }
 
     /* ── Unknown Role Fallback ── */
     console.warn("Unknown session role:", activeSession.role);

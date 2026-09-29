@@ -1,6 +1,5 @@
 /* ==========================================================================
    SRM DevArena — ADMIN CONSOLE THEME (admin/admin.css)
-   Black, Grey & White Theme with Softened Rounded Architecture
    ========================================================================== */
 
 :root {
@@ -18,6 +17,7 @@
   --font-mono: "IBM Plex Mono", Consolas, monospace;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 
+  --radius-xs: 6px;
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 18px;
@@ -65,7 +65,7 @@ body {
   font-weight: 700;
   font-size: 0.72rem;
   padding: 3px 9px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
   letter-spacing: 0.05em;
 }
 
@@ -88,7 +88,7 @@ body {
   border: 1px solid var(--admin-border);
   background: transparent;
   padding: 8px 16px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   transition: all 0.15s ease;
 }
 
@@ -139,14 +139,7 @@ body {
   margin-top: 4px;
 }
 
-/* Main Split View */
-.admin-grid {
-  display: grid;
-  grid-template-columns: 1.25fr 0.75fr;
-  gap: 24px;
-  align-items: start;
-}
-
+/* Panel */
 .panel {
   background: var(--admin-surface);
   border: 1px solid var(--admin-border);
@@ -156,7 +149,7 @@ body {
 }
 
 .panel-header {
-  padding: 18px 22px;
+  padding: 18px 24px;
   border-bottom: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
@@ -165,10 +158,133 @@ body {
 
 .panel-title {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
+
+/* Form Styles */
+.admin-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.74rem;
+  font-family: var(--font-mono);
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.form-group input,
+.cohort-row input,
+.cohort-row select {
+  background: #09090b;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-group input:focus,
+.cohort-row input:focus,
+.cohort-row select:focus {
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+/* Cohort Section */
+.cohorts-section {
+  background: #09090c;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+}
+
+.cohort-rows-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cohort-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 36px;
+  gap: 12px;
+  align-items: center;
+}
+
+.cohort-row select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a1a1aa'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px 14px;
+  padding-right: 32px;
+}
+
+.btn-small-outline {
+  background: transparent;
+  border: 1px solid var(--admin-border);
+  color: #e4e4e7;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  padding: 5px 12px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-small-outline:hover {
+  background: var(--admin-surface-hover);
+  border-color: var(--admin-border-strong);
+  color: #fff;
+}
+
+.btn-remove-cohort {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 6px;
+  border-radius: 4px;
+}
+.btn-remove-cohort:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.btn-white {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 11px 22px;
+  font-weight: 600;
+  font-size: 0.86rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.05s ease;
+}
+.btn-white:hover { opacity: 0.9; }
 
 /* Faculty Table */
 .faculty-table {
@@ -179,7 +295,7 @@ body {
 
 .faculty-table th {
   text-align: left;
-  padding: 12px 20px;
+  padding: 12px 24px;
   background: #0d0d0f;
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -189,7 +305,7 @@ body {
 }
 
 .faculty-table td {
-  padding: 15px 20px;
+  padding: 16px 24px;
   border-bottom: 1px solid var(--admin-border);
   vertical-align: middle;
 }
@@ -212,102 +328,59 @@ body {
   color: var(--admin-text-muted);
 }
 
-.password-cell {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  background: #09090b;
-  padding: 5px 10px;
-  border: 1px solid var(--admin-border);
-  border-radius: var(--radius-sm);
+/* Subtler, Less Curvy Status Badges */
+.status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-}
-
-.btn-icon {
-  background: transparent;
-  border: none;
-  color: var(--admin-text-muted);
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-}
-.btn-icon:hover { color: #fff; }
-
-.track-tag {
-  display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  background: #1c1c20;
-  border: 1px solid var(--admin-border-strong);
-  color: #e4e4e7;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
-  margin: 2px 4px 2px 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--radius-xs); /* Modern 6px radius instead of pill */
+  border: 1px solid transparent;
 }
 
-/* Form Styles */
-.admin-form {
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.status-badge.active {
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.status-badge.admin {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
 }
 
-.form-group label {
-  font-size: 0.76rem;
-  font-family: var(--font-mono);
-  color: var(--admin-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.form-group input {
+/* Managed Tracks Dropdown Inside Table Cell */
+.table-track-select {
   background: #09090b;
   border: 1px solid var(--admin-border);
-  border-radius: var(--radius-sm);
-  color: #fff;
-  padding: 10px 14px;
-  font-family: var(--font-sans);
-  font-size: 0.88rem;
-  outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.form-group input:focus {
-  border-color: #fff;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-}
-
-.btn-white {
-  background: #ffffff;
-  color: #000000;
-  border: none;
-  padding: 11px 20px;
-  font-weight: 600;
-  font-size: 0.86rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
+  color: #e4e4e7;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 6px 28px 6px 10px;
   cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.05s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a1a1aa'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px 12px;
+  outline: none;
+  max-width: 240px;
 }
-.btn-white:hover { opacity: 0.9; }
-.btn-white:active { transform: translateY(1px); }
+.table-track-select:focus {
+  border-color: #fff;
+}
 
 .btn-danger-outline {
   background: transparent;
   color: var(--admin-text-muted);
   border: 1px solid var(--admin-border);
-  padding: 5px 10px;
-  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  border-radius: var(--radius-xs);
   font-size: 0.76rem;
-  font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -317,7 +390,7 @@ body {
   background: rgba(255, 85, 85, 0.08);
 }
 
-/* Password Gate Modal */
+/* Gate Overlay & Toast */
 .admin-gate-overlay {
   position: fixed;
   inset: 0;
@@ -342,33 +415,6 @@ body {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
 }
 
-.gate-card h2 {
-  font-size: 1.3rem;
-  margin: 0 0 6px;
-}
-
-.gate-card p {
-  color: var(--admin-text-muted);
-  font-size: 0.84rem;
-  margin: 0 0 20px;
-}
-
-.gate-card input {
-  background: #09090b;
-  border: 1px solid var(--admin-border);
-  color: #fff;
-  padding: 11px 14px;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: 0.95rem;
-  text-align: center;
-  outline: none;
-}
-.gate-card input:focus {
-  border-color: #fff;
-}
-
-/* Toast */
 .admin-toast {
   position: fixed;
   bottom: 24px;
@@ -389,7 +435,8 @@ body {
 .admin-toast.visible { opacity: 1; }
 
 @media (max-width: 900px) {
-  .admin-grid { grid-template-columns: 1fr; }
+  .form-row-3 { grid-template-columns: 1fr; }
+  .cohort-row { grid-template-columns: 1fr; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-layout { padding: 20px 16px 60px; }
 }
