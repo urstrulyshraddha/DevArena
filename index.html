@@ -33,7 +33,7 @@
       </div>
 
       <button class="theme-toggle" aria-label="Toggle theme">
-        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41-1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
 
@@ -124,9 +124,11 @@
             <div class="field-error" id="facultyEmailError"></div>
           </div>
           <div class="field">
+            <!-- [UPDATED] Faculty set their own password on first login (self-activation).
+                 No admin-assigned password exists anymore. -->
             <label for="facultyPasswordInput">Access Password</label>
             <div class="password-wrapper">
-              <input type="password" id="facultyPasswordInput" placeholder="Enter secure password" autocomplete="current-password" />
+              <input type="password" id="facultyPasswordInput" placeholder="First login sets your password" autocomplete="current-password" />
               <button type="button" id="togglePasswordBtn" class="password-toggle-btn" aria-label="Toggle password visibility">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -234,38 +236,41 @@
                 <span class="test-run-console__title">Sample Test Cases</span>
                 <span class="test-run-console__badge" id="testRunSummaryBadge">Ready</span>
               </div>
+              <!-- [NOTE] renderStudentIoFields() injects the custom I/O textareas here.
+                   The submit pipeline reads them via #studentTestInput / #studentTestOutput. -->
               <div class="test-run-cases" id="testRunResultsList"></div>
             </div>
           </div>
         </div>
 
         <!-- Reflection Card: Written Notes + Strict PDF Upload -->
-                <div class="card">
-                  <div class="card-header">
-                    <div>
-                      <h3>Reflection</h3>
-                      <p class="text-xs text-muted" style="margin:2px 0 0;">Provide your conceptual approach and attach an optional PDF document.</p>
-                    </div>
-                    <div class="editor-toolbar">
-                      <button type="button" class="btn btn-outline btn-sm file-btn">
-                        📎 Upload .pdf Document
-                        <input type="file" id="pdfFileInput" accept=".pdf,application/pdf" />
-                      </button>
-                    </div>
-                  </div>
-                  <div class="card-body">
-                    <textarea class="reflection-area" id="reflectionArea" placeholder="Explain your design thinking, edge cases handled, or where you ran into bottlenecks..."></textarea>
-                    <div id="reflectionFileChipWrap" style="margin-top: 8px;" hidden>
-                      <span class="file-chip" id="reflectionFileChip"></span>
-                      <button type="button" id="removePdfBtn" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.8rem; margin-left:6px;">✕ Remove</button>
-                    </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Reflection</h3>
+              <p class="text-xs text-muted" style="margin:2px 0 0;">Provide your conceptual approach and attach an optional PDF document.</p>
+            </div>
+            <div class="editor-toolbar">
+              <button type="button" class="btn btn-outline btn-sm file-btn">
+                📎 Upload .pdf Document
+                <input type="file" id="pdfFileInput" accept=".pdf,application/pdf" />
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <textarea class="reflection-area" id="reflectionArea" placeholder="Explain your design thinking, edge cases handled, or where you ran into bottlenecks..."></textarea>
+            <div id="reflectionFileChipWrap" style="margin-top: 8px;" hidden>
+              <span class="file-chip" id="reflectionFileChip"></span>
+              <button type="button" id="removePdfBtn" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.8rem; margin-left:6px;">✕ Remove</button>
+            </div>
 
-                    <div class="submission-actions" id="submissionActions" style="margin-top: 16px;">
-                      <button class="btn btn-primary" id="submitBtn">Submit Solution &amp; Reflection</button>
-                      <div id="reReviewWrap"></div>
-                    </div>
-                  </div>
-                </div>
+            <div class="submission-actions" id="submissionActions" style="margin-top: 16px;">
+              <!-- [NOTE] id stays "submitBtn" — workspace.js submitSolution() targets this id. -->
+              <button class="btn btn-primary" id="submitBtn">Submit Solution &amp; Reflection</button>
+              <div id="reReviewWrap"></div>
+            </div>
+          </div>
+        </div>
       </section>
 
     </div>
@@ -282,11 +287,19 @@
           <p id="facultyBannerTitle">—</p>
         </div>
 
+        <!-- [UPDATED] Filter bar: SECTION dropdown (was "ACTIVE CHALLENGE TRACK")
+             + new DAY dropdown to pick which day's challenge the table shows. -->
         <div class="faculty-track-controls">
           <div class="track-select-group">
-            <label for="facultyTrackSelect" class="text-xs" style="color: rgba(255,255,255,0.7); font-weight:600;">ACTIVE CHALLENGE TRACK:</label>
+            <label for="facultyTrackSelect" class="text-xs" style="color: rgba(255,255,255,0.7); font-weight:600;">SECTION:</label>
             <select id="facultyTrackSelect" class="faculty-select"></select>
           </div>
+
+          <div class="track-select-group">
+            <label for="facultyDaySelect" class="text-xs" style="color: rgba(255,255,255,0.7); font-weight:600;">DAY:</label>
+            <select id="facultyDaySelect" class="faculty-select"></select>
+          </div>
+
           <button type="button" class="btn btn-forest" id="openCreateTrackModalBtn">+ Create Challenge Track</button>
         </div>
       </section>
@@ -337,11 +350,14 @@
             <div class="table-container">
               <table class="rank-table faculty-table">
                 <thead>
+                  <!-- [UPDATED] New "Files" column: "View File" links to the Drive file
+                       that holds the student's code AND the appended AI evaluation report. -->
                   <tr>
                     <th>Student</th>
                     <th>Status / Stage</th>
                     <th>Submitted</th>
-                    <th>Attached PDF</th>
+                    <th>Reflection PDF</th>
+                    <th>Files</th>
                     <th style="text-align:right;">Awarded Marks</th>
                     <th style="text-align:right;">Actions</th>
                   </tr>
@@ -351,12 +367,23 @@
             </div>
           </div>
 
+          <!-- [UPDATED] Review drawer: now shows AI remarks parsed from the sheet
+               and a direct link to the Drive file (code + AI report live together). -->
           <div class="card" id="facultyReviewDrawer" hidden>
             <div class="card-header">
               <h3 id="inspectStudentName">Student Code &amp; Reflection Inspect</h3>
               <button type="button" class="btn btn-outline btn-sm" id="closeDrawerBtn">Close</button>
             </div>
             <div class="card-body">
+
+              <!-- [NEW] Link to the single Drive file holding code + AI report -->
+              <a id="inspectViewFileBtn" class="btn btn-outline btn-sm" target="_blank" rel="noopener"
+                 style="display:none; margin-bottom:10px;">🔗 Open Drive File (Code + AI Report)</a>
+
+              <!-- [NEW] AI evaluation summary pulled from AI_Remarks column -->
+              <pre id="inspectAiNotes" style="display:none; background:var(--bg-surface); border:1px solid var(--border-light);
+                   border-radius:8px; padding:12px; font-size:0.75rem; white-space:pre-wrap; margin-bottom:10px;"></pre>
+
               <div class="field">
                 <label>Submitted Code:</label>
                 <textarea class="code-editor" id="inspectCode" readonly style="min-height: 180px;"></textarea>
@@ -384,21 +411,29 @@
   <div class="modal-overlay" id="createTrackModal" hidden>
     <div class="onboarding-card">
       <div class="onboarding-head">
+        <!-- [UPDATED] Tracks are now section-aware (e.g. Code2Think · AIML-F). -->
         <h2>Create Challenge Track</h2>
-        <p>Design a cohort track for a specific academic year (e.g. Code2Grow).</p>
+        <p>Design a section-wise cohort track for a specific academic year.</p>
       </div>
       <form class="onboarding-form" id="createTrackForm">
         <div class="field">
           <label for="newTrackName">Track Name</label>
-          <input type="text" id="newTrackName" placeholder="e.g. Code2Grow" required />
+          <input type="text" id="newTrackName" placeholder="e.g. Code2Think" required />
         </div>
+
+        <!-- [NEW] Section field — combined with the name in dropdowns as "Name · Section" -->
+        <div class="field">
+          <label for="newTrackSection">Section</label>
+          <input type="text" id="newTrackSection" placeholder="e.g. AIML-F or CS-C" required />
+        </div>
+
         <div class="field">
           <label for="newTrackYear">Target Academic Year</label>
           <select id="newTrackYear" required></select>
         </div>
         <div class="field">
           <label for="newTrackDesc">Short Description</label>
-          <textarea id="newTrackDesc" rows="2" placeholder="e.g. Intermediate algorithms and data structures..." required></textarea>
+          <textarea id="newTrackDesc" rows="2" placeholder="e.g. Foundational problem-solving for first-year engineers..." required></textarea>
         </div>
         <div class="mini-dialog-actions">
           <button type="button" class="btn btn-outline btn-sm" id="closeCreateTrackBtn">Cancel</button>
@@ -471,6 +506,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/main.js?v=2.1"></script>
 </body>
 </html>
