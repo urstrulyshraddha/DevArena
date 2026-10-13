@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SRM DevArena — Student Cohort Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="leaderboard.css" />
+</head>
+<body data-page="student-leaderboard" data-role="student">
+
+  <!-- ============================= Topbar Header ============================= -->
+  <header class="app-header">
+    <div class="brand">
+      <img src="../assets/srmaplogo.png" alt="SRM University-AP" class="brand-seal" />
+      <div class="brand-copy">
+        <div class="brand-name">SRM DevArena</div>
+        <div class="brand-sub">SRM University-AP · Academic Coding Portal</div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <nav class="site-nav">
+        <a href="workspace.html">Workspace</a>
+        <a href="leaderboard.html" class="active">Leaderboard</a>
+      </nav>
+
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41-1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+
+      <!-- Profile Badge with Dropdown -->
+      <div class="profile-badge" id="profileBadge">
+        <div class="profile-avatar" id="profileAvatar">S</div>
+        <div class="profile-meta">
+          <div class="profile-name" id="profileName">Student</div>
+          <div class="profile-track" id="profileTrack">Track</div>
+        </div>
+        <button class="profile-menu-btn" id="profileMenuBtn" aria-label="Account menu">▾</button>
+        <div class="profile-dropdown" id="profileDropdown">
+          <button id="switchTrackBtn">Switch Track</button>
+          <button id="logoutBtn" class="danger-item">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================= Main Layout ============================= -->
+  <main class="leaderboard-layout">
+
+    <div class="leaderboard-head">
+      <div>
+        <h1 class="page-title">Cohort Leaderboard</h1>
+        <p class="page-desc">Real-time standings and your verified performance analytics.</p>
+      </div>
+    </div>
+
+    <!-- Top Two-Column Grid: Personal Standing on Left, Personal Trajectory Graph on Right -->
+    <div class="overview-grid">
+      <!-- Left: Student's Personal Standing -->
+      <section class="student-standing-card">
+        <div class="student-standing-meta">
+          <h2>Your Standing in Cohort</h2>
+          <p id="studentStandingSubtitle">Track: —</p>
+        </div>
+        <div class="student-standing-stats">
+          <div class="standing-stat-box">
+            <div class="val font-mono" id="myRankVal">#—</div>
+            <div class="lbl">Current Rank</div>
+          </div>
+          <div class="standing-stat-box">
+            <div class="val font-mono" id="myRawPointsVal">—</div>
+            <div class="lbl">Raw Points</div>
+          </div>
+          <div class="standing-stat-box">
+            <div class="val font-mono" id="myMarksVal">— / 5.00</div>
+            <div class="lbl">Internal Marks</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Individual Task Progress Graph (Your Personal Trajectory) -->
+      <section class="curve-card card">
+        <div class="curve-card__header">
+          <h3>Your Performance Trajectory</h3>
+          <span class="text-xs text-muted font-mono" id="cohortSizeLabel">Evaluated: —</span>
+        </div>
+        <div class="curve-svg-container" id="curveSvgContainer">
+          <svg viewBox="0 0 500 90" preserveAspectRatio="none" id="scoreCurveSvg">
+            <defs>
+              <linearGradient id="curveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <path class="curve-path-fill" id="curveFill" d="M0,90 L500,90 Z"/>
+            <path class="curve-path-stroke" id="curveStroke" d="M0,90 L500,90"/>
+            <g id="curvePoints"></g>
+          </svg>
+        </div>
+      </section>
+    </div>
+
+    <!-- Reduced Standings Table -->
+    <section class="standings-card">
+      <div class="standings-card__header">
+        <h2>Cohort Standings</h2>
+        <span class="text-faint text-xs font-mono" id="tableFilterLabel">—</span>
+      </div>
+      <div class="table-responsive">
+        <table class="student-rank-table" aria-label="Cohort Standings">
+          <thead>
+            <tr>
+              <th scope="col">Rank</th>
+              <th scope="col">Student</th>
+              <th scope="col">Enrolled Track</th>
+              <th scope="col">Raw Points</th>
+              <th scope="col">Converted Marks</th>
+            </tr>
+          </thead>
+          <tbody id="studentRankTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="leaderboard.js"></script>
+</body>
+</html>

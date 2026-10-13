@@ -1,5 +1,6 @@
 /* ==========================================================================
    SRM DevArena — ADMIN CONSOLE THEME (admin/admin.css)
+   Clean Monochromatic Dark Aesthetic & Mobile-Responsive Architecture
    ========================================================================== */
 
 :root {
@@ -24,7 +25,7 @@
   --radius-full: 9999px;
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
@@ -38,24 +39,36 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Header */
+/* --------------------------------------------------------------------------
+   HEADER
+   -------------------------------------------------------------------------- */
 .admin-header {
-  height: 68px;
+  min-height: 68px;
   background: var(--admin-surface);
   border-bottom: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
+  padding: 12px 32px;
   position: sticky;
   top: 0;
   z-index: 50;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .admin-brand {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .admin-badge {
@@ -67,6 +80,7 @@ body {
   padding: 3px 9px;
   border-radius: var(--radius-xs);
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .admin-title {
@@ -80,6 +94,13 @@ body {
   color: var(--admin-text-muted);
 }
 
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .admin-nav-link {
   color: var(--admin-text-muted);
   text-decoration: none;
@@ -90,6 +111,10 @@ body {
   padding: 8px 16px;
   border-radius: var(--radius-sm);
   transition: all 0.15s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .admin-nav-link:hover {
@@ -98,7 +123,9 @@ body {
   border-color: var(--admin-border-strong);
 }
 
-/* Layout */
+/* --------------------------------------------------------------------------
+   LAYOUT
+   -------------------------------------------------------------------------- */
 .admin-layout {
   max-width: 1240px;
   margin: 0 auto;
@@ -108,7 +135,9 @@ body {
   gap: 24px;
 }
 
-/* Stat Grid */
+/* --------------------------------------------------------------------------
+   STAT GRID
+   -------------------------------------------------------------------------- */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -137,9 +166,17 @@ body {
   font-weight: 700;
   color: var(--admin-text-white);
   margin-top: 4px;
+  line-height: 1.2;
 }
 
-/* Panel */
+.stat-card .value-db {
+  font-size: 1.15rem;
+  color: #22c55e;
+}
+
+/* --------------------------------------------------------------------------
+   PANELS & FORMS
+   -------------------------------------------------------------------------- */
 .panel {
   background: var(--admin-surface);
   border: 1px solid var(--admin-border);
@@ -154,6 +191,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .panel-title {
@@ -163,7 +202,20 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Form Styles */
+.panel-sub {
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+  display: block;
+  margin-top: 2px;
+}
+
+.panel-badge-mono {
+  font-size: 0.72rem;
+  color: var(--admin-text-muted);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
 .admin-form {
   padding: 24px;
   display: flex;
@@ -202,6 +254,7 @@ body {
   font-family: var(--font-sans);
   font-size: 0.88rem;
   outline: none;
+  width: 100%;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -212,12 +265,30 @@ body {
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
-/* Cohort Section */
+/* --------------------------------------------------------------------------
+   COHORTS SECTION & BUILDER
+   -------------------------------------------------------------------------- */
 .cohorts-section {
   background: #09090c;
   border: 1px solid var(--admin-border);
   border-radius: var(--radius-md);
   padding: 16px 20px;
+}
+
+.cohorts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cohorts-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
 }
 
 .cohort-rows-wrap {
@@ -249,11 +320,13 @@ body {
   color: #e4e4e7;
   font-family: var(--font-mono);
   font-size: 0.74rem;
-  padding: 5px 12px;
+  padding: 6px 12px;
   border-radius: var(--radius-xs);
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
+
 .btn-small-outline:hover {
   background: var(--admin-surface-hover);
   border-color: var(--admin-border-strong);
@@ -262,15 +335,38 @@ body {
 
 .btn-remove-cohort {
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: #ef4444;
   cursor: pointer;
   font-size: 1rem;
-  padding: 6px;
-  border-radius: 4px;
+  height: 38px;
+  width: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+  transition: all 0.15s ease;
 }
+
 .btn-remove-cohort:hover {
   background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.form-footer-hint {
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+  margin: 0;
+  max-width: 520px;
 }
 
 .btn-white {
@@ -283,12 +379,25 @@ body {
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: opacity 0.15s ease, transform 0.05s ease;
+  white-space: nowrap;
 }
-.btn-white:hover { opacity: 0.9; }
 
-/* Faculty Table */
+.btn-white:hover {
+  opacity: 0.9;
+}
+
+/* --------------------------------------------------------------------------
+   FACULTY DIRECTORY TABLE
+   -------------------------------------------------------------------------- */
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .faculty-table {
   width: 100%;
+  min-width: 680px; /* guarantees headers and columns stay readable on mobile scroll */
   border-collapse: collapse;
   font-size: 0.85rem;
 }
@@ -302,6 +411,7 @@ body {
   color: var(--admin-text-muted);
   text-transform: uppercase;
   border-bottom: 1px solid var(--admin-border);
+  white-space: nowrap;
 }
 
 .faculty-table td {
@@ -328,7 +438,6 @@ body {
   color: var(--admin-text-muted);
 }
 
-/* Subtler, Less Curvy Status Badges */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -336,8 +445,9 @@ body {
   font-size: 0.72rem;
   font-weight: 500;
   padding: 4px 10px;
-  border-radius: var(--radius-xs); /* Modern 6px radius instead of pill */
+  border-radius: var(--radius-xs);
   border: 1px solid transparent;
+  white-space: nowrap;
 }
 
 .status-badge.active {
@@ -352,7 +462,6 @@ body {
   color: #38bdf8;
 }
 
-/* Managed Tracks Dropdown Inside Table Cell */
 .table-track-select {
   background: #09090b;
   border: 1px solid var(--admin-border);
@@ -368,8 +477,10 @@ body {
   background-position: right 8px center;
   background-size: 12px 12px;
   outline: none;
+  width: 100%;
   max-width: 240px;
 }
+
 .table-track-select:focus {
   border-color: #fff;
 }
@@ -383,26 +494,34 @@ body {
   font-size: 0.76rem;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
+
 .btn-danger-outline:hover {
   color: #ff5555;
   border-color: #ff5555;
   background: rgba(255, 85, 85, 0.08);
 }
 
-/* Gate Overlay & Toast */
+/* --------------------------------------------------------------------------
+   GATE OVERLAY & TOAST
+   -------------------------------------------------------------------------- */
 .admin-gate-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.88);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 24px;
+  padding: 20px;
 }
-.admin-gate-overlay[hidden] { display: none; }
+
+.admin-gate-overlay[hidden] {
+  display: none !important;
+}
 
 .gate-card {
   width: 100%;
@@ -410,9 +529,38 @@ body {
   background: var(--admin-surface);
   border: 1px solid var(--admin-border-strong);
   border-radius: var(--radius-lg);
-  padding: 32px 28px;
+  padding: 32px 24px;
   text-align: center;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+}
+
+.gate-form-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.gate-form-wrap input {
+  background: #09090b;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  padding: 11px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.gate-form-wrap input:focus {
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.gate-error-msg {
+  color: #ef4444;
+  font-size: 0.75rem;
+  min-height: 1.2em;
 }
 
 .admin-toast {
@@ -432,11 +580,111 @@ body {
   transition: opacity 0.15s ease;
   z-index: 9999;
 }
-.admin-toast.visible { opacity: 1; }
 
-@media (max-width: 900px) {
-  .form-row-3 { grid-template-columns: 1fr; }
-  .cohort-row { grid-template-columns: 1fr; }
-  .stat-grid { grid-template-columns: repeat(2, 1fr); }
-  .admin-layout { padding: 20px 16px 60px; }
+.admin-toast.visible {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE BREAKPOINTS (Tablet & Mobile Specific)
+   -------------------------------------------------------------------------- */
+@media (max-width: 992px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-header {
+    padding: 12px 18px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-actions .admin-nav-link {
+    flex: 1;
+    text-align: center;
+  }
+
+  .admin-layout {
+    padding: 18px 14px 60px;
+    gap: 18px;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 14px 16px;
+  }
+
+  .stat-card .value {
+    font-size: 1.4rem;
+  }
+
+  .cohort-row {
+    grid-template-columns: 1fr 1fr;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--admin-border);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+  }
+
+  .cohort-row .cohort-track-name {
+    grid-column: 1 / -1;
+  }
+
+  .cohort-row .btn-remove-cohort {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 32px;
+    background: rgba(239, 68, 68, 0.1);
+  }
+
+  .form-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-footer .btn-white {
+    width: 100%;
+  }
+
+  .faculty-table th,
+  .faculty-table td {
+    padding: 12px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-brand {
+    gap: 8px;
+  }
+
+  .admin-title {
+    font-size: 0.95rem;
+  }
+
+  .admin-meta {
+    display: none; /* Keep header uncluttered on small screens */
+  }
+
+  .cohort-row {
+    grid-template-columns: 1fr;
+  }
 }

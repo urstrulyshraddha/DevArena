@@ -23,34 +23,40 @@ async function renderAll() {
   let totalTracks = 0;
   faculties.forEach((f) => { totalTracks += (f.tracks || []).length; });
 
-  document.getElementById("statFacultyCount").textContent = faculties.length;
-  document.getElementById("statTrackCount").textContent = totalTracks;
+  const statFacultyEl = document.getElementById("statFacultyCount");
+  const statTrackEl = document.getElementById("statTrackCount");
+  if (statFacultyEl) statFacultyEl.textContent = faculties.length;
+  if (statTrackEl) statTrackEl.textContent = totalTracks;
 
   // Fetch total challenges count across all tracks
   try {
     const chRes = await API.getChallenges("all");
     const count = (chRes && Array.isArray(chRes.challenges)) ? chRes.challenges.length : 0;
-    document.getElementById("statChallengeCount").textContent = count;
+    const challengeCountEl = document.getElementById("statChallengeCount");
+    if (challengeCountEl) challengeCountEl.textContent = count;
   } catch (e) {
-    document.getElementById("statChallengeCount").textContent = "—";
+    const challengeCountEl = document.getElementById("statChallengeCount");
+    if (challengeCountEl) challengeCountEl.textContent = "—";
   }
 
+  if (!tbody) return;
   tbody.innerHTML = "";
+
   if (faculties.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:#666;">No faculty accounts provisioned.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:#71717a;">No faculty accounts provisioned.</td></tr>`;
     return;
   }
 
   faculties.forEach((f) => {
     const tr = document.createElement("tr");
 
-    // Account Status with reduced radius (6px)
+    // Account Status
     const statusBadge = f.role === "admin"
       ? `<span class="status-badge admin">Root Admin</span>`
       : `<span class="status-badge active">Self-Activated</span>`;
 
     // Managed Tracks rendered as a Dropdown
-    let tracksDropdownHtml = '<span style="color:#666; font-size:0.75rem;">None created</span>';
+    let tracksDropdownHtml = '<span style="color:#71717a; font-size:0.75rem;">None created</span>';
     if (f.tracks && f.tracks.length > 0) {
       tracksDropdownHtml = `
         <select class="table-track-select">
@@ -65,12 +71,12 @@ async function renderAll() {
         <div class="faculty-name">${f.name}</div>
         <div class="faculty-sub">${f.title || "Faculty Member"}</div>
       </td>
-      <td style="font-family:var(--font-mono); color:#bbb;">${f.email}</td>
+      <td style="font-family:var(--font-mono); color:#a1a1aa;">${f.email}</td>
       <td>${statusBadge}</td>
       <td>${tracksDropdownHtml}</td>
       <td style="text-align:right;">
         ${f.role === "admin"
-          ? '<span style="color:#555; font-size:0.75rem;">Protected</span>'
+          ? '<span style="color:#52525b; font-size:0.75rem;">Protected</span>'
           : `<button type="button" class="btn-danger-outline delete-btn" data-id="${f.id}">Revoke</button>`
         }
       </td>
@@ -122,7 +128,7 @@ if (addCohortRowBtn) {
 }
 
 /* ── Provision Faculty + Multiple Cohorts (Direct to Sheets) ── */
-document.getElementById("addFacultyForm").addEventListener("submit", async (e) => {
+document.getElementById("addFacultyForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const name  = document.getElementById("newFacultyName").value.trim();
   const title = document.getElementById("newFacultyTitle").value.trim();
@@ -192,20 +198,20 @@ const gateError = document.getElementById("gateError");
 const activeSession = JSON.parse(localStorage.getItem("devarena.session") || "null");
 
 if (activeSession && activeSession.role === "admin") {
-  gateOverlay.setAttribute("hidden", "");
+  if (gateOverlay) gateOverlay.setAttribute("hidden", "");
   boot();
 } else {
-  gateOverlay.removeAttribute("hidden");
-  gateSubmit.addEventListener("click", async () => {
+  if (gateOverlay) gateOverlay.removeAttribute("hidden");
+  gateSubmit?.addEventListener("click", async () => {
     const password = gatePassInput.value.trim();
     if (!password) {
-      gateError.textContent = "Please enter admin password.";
+      if (gateError) gateError.textContent = "Please enter admin password.";
       return;
     }
 
     gateSubmit.disabled = true;
     gateSubmit.textContent = "Verifying...";
-    gateError.textContent = "";
+    if (gateError) gateError.textContent = "";
 
     try {
       const res = await API.facultyAuth("shraddha_kondaveeti@srmap.edu.in", password, "admin");
@@ -217,13 +223,13 @@ if (activeSession && activeSession.role === "admin") {
           facultyId: "shraddha",
           title: "System Admin"
         }));
-        gateOverlay.setAttribute("hidden", "");
+        if (gateOverlay) gateOverlay.setAttribute("hidden", "");
         boot();
       } else {
-        gateError.textContent = res.error || "Invalid master credentials.";
+        if (gateError) gateError.textContent = res.error || "Invalid master credentials.";
       }
     } catch (err) {
-      gateError.textContent = "Authentication error: " + err.message;
+      if (gateError) gateError.textContent = "Authentication error: " + err.message;
     } finally {
       gateSubmit.disabled = false;
       gateSubmit.textContent = "Unlock Console";
@@ -242,7 +248,7 @@ async function boot() {
   await renderAll();
 }
 
-document.getElementById("purgeCacheBtn").addEventListener("click", () => {
+document.getElementById("purgeCacheBtn")?.addEventListener("click", () => {
   if (confirm("Purge browser session and reload console?")) {
     localStorage.clear();
     sessionStorage.clear();

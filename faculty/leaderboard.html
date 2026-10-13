@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SRM DevArena — Faculty Moderation Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="leaderboard.css" />
+</head>
+<body data-page="faculty-leaderboard" data-role="faculty">
+
+  <!-- ============================= Topbar Header ============================= -->
+  <header class="app-header">
+    <div class="brand">
+      <img src="../assets/srmaplogo.png" alt="SRM University-AP seal" class="brand-seal" />
+      <div class="brand-copy">
+        <div class="brand-name">SRM DevArena</div>
+        <div class="brand-sub">SRM University-AP · Academic Coding Portal</div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <nav class="site-nav">
+        <a href="workspace.html">Workspace</a>
+        <a href="leaderboard.html" class="active">Leaderboard</a>
+      </nav>
+
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggleBtn" type="button" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41-1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+
+      <!-- Profile Badge with Dropdown -->
+      <div class="profile-badge" id="profileBadge">
+        <button class="profile-trigger" id="profileMenuBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Faculty profile menu">
+          <div class="profile-meta">
+            <span class="profile-name" id="profileName">Faculty</span>
+            <span class="profile-track" id="profileTrack">CSE Department</span>
+          </div>
+          <span class="profile-chevron-box" aria-hidden="true">
+            <svg class="profile-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </span>
+        </button>
+        <div class="profile-dropdown" id="profileDropdown">
+          <button id="switchTrackBtn" type="button">Switch Section</button>
+          <button id="logoutBtn" class="danger-item" type="button">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================= Main Layout ============================= -->
+  <main class="leaderboard-layout">
+
+    <div class="leaderboard-head" style="display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:24px;">
+      <div>
+        <h1 class="page-title" style="font-size:1.75rem; margin-bottom:4px;">Faculty Moderation Leaderboard</h1>
+        <p class="page-desc" style="color:var(--text-muted); font-size:0.88rem; margin:0;">Live cohort standings with raw points and converted internal marks.</p>
+      </div>
+
+      <!-- Toolbar: Track Selector + Student Search -->
+      <!-- Toolbar: Track Selector + Student Search -->
+            <div class="leaderboard-toolbar">
+              <select id="leaderboardTrackSelect" class="form-select"></select>
+              <input type="text" id="leaderboardSearchInput" placeholder="🔍 Search name or Reg No..." />
+            </div>
+    </div>
+
+    <!-- 4-Stat Metric Summary Strip -->
+    <div class="summary-strip" id="summaryStrip" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:24px;"></div>
+
+    <!-- Full-Width Standings Table -->
+        <section class="standings-card">
+          <div class="standings-card__header">
+            <h2>Cohort Standings</h2>
+            <span class="text-faint text-xs font-mono" id="tableFilterLabel">—</span>
+          </div>
+          <div class="table-responsive">
+            <table class="faculty-rank-table" aria-label="Cohort Standings">
+              <thead>
+                <tr>
+                  <th scope="col" class="col-rank">Rank</th>
+                  <th scope="col" class="col-student">Student</th>
+                  <th scope="col" class="col-track">Assigned Track</th>
+                  <th scope="col" class="col-points">Raw Points</th>
+                  <th scope="col" class="col-marks">Converted Marks</th>
+                </tr>
+              </thead>
+              <tbody id="facultyRankTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="leaderboard.js"></script>
+</body>
+</html>

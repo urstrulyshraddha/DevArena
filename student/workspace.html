@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SRM DevArena — Student Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="workspace.css" />
+</head>
+<body data-page="student-workspace" data-role="student">
+
+  <!-- ============================= Topbar Header ============================= -->
+  <header class="app-header">
+    <div class="brand">
+      <img src="../assets/srmaplogo.png" alt="SRM University-AP" class="brand-seal" />
+      <div class="brand-copy">
+        <div class="brand-name">SRM DevArena</div>
+        <div class="brand-sub">SRM University-AP · Academic Coding Portal</div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <nav class="site-nav">
+        <a href="workspace.html" class="active">Workspace</a>
+        <a href="leaderboard.html">Leaderboard</a>
+      </nav>
+
+      <div class="marks-chip" id="marksChip">
+        <span class="marks-primary font-mono" id="headerMarksPrimary">Converted Marks: — / 5.00</span>
+        <span class="marks-secondary font-mono" id="headerMarksSecondary">— raw points</span>
+      </div>
+
+      <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41-1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+
+      <div class="profile-badge">
+        <div class="profile-avatar" id="profileAvatar">S</div>
+        <div class="profile-meta">
+          <div class="profile-name" id="profileName">Student</div>
+          <div class="profile-track" id="profileTrack">Track</div>
+        </div>
+        <button class="profile-menu-btn" id="profileMenuBtn">▾</button>
+        <div class="profile-dropdown" id="profileDropdown">
+          <button id="switchTrackBtn">Switch Track</button>
+          <button id="logoutBtn" class="danger-item">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================= Main Student Shell ============================= -->
+  <main class="workspace-shell">
+    <div class="workspace-layout">
+      <!-- Enrolled Track Banner -->
+      <section class="track-banner">
+        <div class="track-banner-copy">
+          <div class="eyebrow">Your Enrolled Track</div>
+          <h1 id="trackBannerName">—</h1>
+          <p id="trackBannerDesc">—</p>
+          <p id="trackBannerMentor" style="margin-top:4px; font-size:0.8rem;"></p>
+        </div>
+      </section>
+
+      <!-- Left Column: Challenges & Stepper -->
+      <aside class="workspace-left">
+        <div class="card">
+          <div class="card-header">
+            <h3>Challenges</h3>
+          </div>
+          <div class="card-body">
+            <div id="challengeList" class="task-list"></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 id="activeChallengeTitle" style="margin:0;">—</h3>
+            <span class="challenge-item-points font-mono" id="activeChallengePoints"></span>
+          </div>
+          <div class="card-body">
+            <ul class="stepper" id="stepper"></ul>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Column: Code Editor, Test Cases & Reflection -->
+      <section class="workspace-right">
+        <!-- Specs & Guidelines -->
+        <div class="card">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="problemStatementPanel">Problem Statement</button>
+          </div>
+
+          <div class="tab-panel active no-select" id="problemStatementPanel">
+            <p class="statement-text" id="statementText">—</p>
+          </div>
+
+          <div class="tab-panel" id="guidelinesPanel">
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:14px;">
+              <div class="card" style="padding:14px; text-align:center;">
+                <div class="font-mono font-bold" style="font-size:1.1rem; color:#38bdf8;">1.0s</div>
+                <div class="text-xs text-muted">Time Limit</div>
+              </div>
+              <div class="card" style="padding:14px; text-align:center;">
+                <div class="font-mono font-bold" style="font-size:1.1rem; color:#38bdf8;">256MB</div>
+                <div class="text-xs text-muted">Memory Limit</div>
+              </div>
+              <div class="card" style="padding:14px; text-align:center;">
+                <div class="font-mono font-bold" style="font-size:1.1rem; color:#38bdf8;" id="pointsStat">10 Pts</div>
+                <div class="text-xs text-muted">Max Marks</div>
+              </div>
+            </div>
+            <p class="text-sm text-muted">Read inputs strictly via standard input (stdin) and print results to standard output (stdout).</p>
+          </div>
+        </div>
+
+        <!-- Code Solution Block (Copy-Paste Disabled) -->
+        <!-- Code Solution Block -->
+                <div class="card">
+                  <div class="card-header">
+                    <div class="card-header-left">
+                      <h3 style="margin:0;">Code Solution</h3>
+                      <select id="langSelect" class="student-select">
+                        <option value="python">Python (.py)</option>
+                        <option value="c">C (.c)</option>
+                        <option value="cpp">C++ (.cpp)</option>
+                        <option value="java">Java (.java)</option>
+                      </select>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <label class="btn btn-outline btn-sm file-upload-label" id="codeUploadBtnLabel">
+                        📁 Upload <span id="codeUploadExtLabel">.py</span>
+                        <input type="file" id="codeFileInput" accept=".py" />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="card-body">
+                    <textarea
+                      class="code-editor"
+                      id="codeEditor"
+                      spellcheck="false"
+                      placeholder="# Write your code solution here or upload a source file above..."
+                      autocomplete="off"
+                      autocorrect="off"
+                      autocapitalize="off"
+                    ></textarea>
+
+            <!-- Test Cases Input Workspace (Editable by student) -->
+            <div class="test-cases-editor-card">
+              <div class="test-cases-editor-head">
+                <span class="test-cases-title">Verified Test Cases (Custom / Sample Runs)</span>
+                <span class="text-xs text-muted">Document the test cases you ran on your local machine</span>
+              </div>
+              <div class="test-cases-grid">
+                <div class="test-field-box">
+                  <label for="studentTestInput">Test Case Inputs (stdin)</label>
+                  <textarea
+                    id="studentTestInput"
+                    class="test-io-textarea"
+                    placeholder="Enter the test inputs you provided (e.g. 5&#10;10 20 30 40 50)..."
+                  ></textarea>
+                </div>
+                <div class="test-field-box">
+                  <label for="studentTestOutput">Expected / Observed Output (stdout)</label>
+                  <textarea
+                    id="studentTestOutput"
+                    class="test-io-textarea"
+                    placeholder="Enter the exact output your code produced..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reflection Card -->
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h3 style="margin:0;">Reflection</h3>
+              <p class="text-xs text-muted" style="margin:2px 0 0;">Explain approach, bottlenecks, or attach documentation PDF.</p>
+            </div>
+            <label class="btn btn-outline btn-sm file-upload-label">
+              📎 Upload .pdf
+              <input type="file" id="pdfFileInput" accept=".pdf,application/pdf" />
+            </label>
+          </div>
+          <div class="card-body">
+            <textarea
+              class="reflection-area protected-editor"
+              id="reflectionArea"
+              placeholder="Explain your approach, edge cases handled, or logic overview..."
+              autocomplete="off"
+            ></textarea>
+
+            <div id="reflectionFileChipWrap" style="margin-top:8px;" hidden>
+              <span class="file-chip" id="reflectionFileChip"></span>
+              <button type="button" id="removePdfBtn" class="btn-remove-file">✕ Remove</button>
+            </div>
+
+            <div style="margin-top:16px;">
+              <button class="btn btn-primary" id="submitBtn">Submit Solution &amp; Reflection</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="workspace.js"></script>
+</body>
+</html>

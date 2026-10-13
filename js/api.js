@@ -1,17 +1,57 @@
 /* ==========================================================================
    SRM DevArena — API Client (js/api.js)
+   Robust backend communication with automatic retry and cold-start protection
    ========================================================================== */
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbytb0Z89jwHHoqLpfBDZD4h0sd9VMWGomT6i5ymyNmFVSV6ky2Vec_sunrazRB3x4LaCg/exec";
 
 /**
- * POST helper — sends action in both query param AND request body
+ * Resilient fetch wrapper handling GAS cold starts, HTML error redirects,
+ * and transient rate-limit (429/503) drops.
+ */
+async function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
+  try {
+    const res = await fetch(url, {
+      ...options,
+      mode: "cors",
+      redirect: "follow"
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const text = await res.text();
+
+    // Catch Google Apps Script HTML error redirects or permission warnings
+    if (text.trim().startsWith("<")) {
+      throw new Error("Server returned HTML redirect instead of JSON (Apps Script cold start or auth redirect)");
+    }
+
+    const json = JSON.parse(text);
+    if (json && json.success === false) {
+      throw new Error(json.error || "Backend error");
+    }
+
+    return json;
+  } catch (err) {
+    if (retries > 0) {
+      console.warn(`[DevArena API] Request to ${url.slice(0, 70)}... failed: ${err.message}. Retrying in ${delay}ms (${retries} retries left)...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return fetchWithRetry(url, options, retries - 1, delay * 1.5);
+    }
+    throw err;
+  }
+}
+
+/**
+ * POST helper — sends action in query param AND request body
  * so it works whether GAS inspects e.parameter or e.postData.contents.
  */
 async function post(action, payload = {}) {
   const url = `${GAS_URL}?action=${encodeURIComponent(action)}`;
 
-  const res = await fetch(url, {
+  return fetchWithRetry(url, {
     method: "POST",
     headers: {
       "Content-Type": "text/plain;charset=utf-8"
@@ -19,35 +59,18 @@ async function post(action, payload = {}) {
     body: JSON.stringify({
       action,
       ...payload
-    }),
-    mode: "cors",
-    redirect: "follow"
+    })
   });
-
-  const json = await res.json();
-  if (json && json.success === false) {
-    throw new Error(json.error || "Backend error");
-  }
-  return json;
 }
-
 
 /**
  * GET helper — encodes action + params into the query string.
  */
 async function get(action, params = {}) {
   const qs = new URLSearchParams({ action, ...params }).toString();
-
-  const res = await fetch(`${GAS_URL}?${qs}`, {
-    mode: "cors",
-    redirect: "follow"
+  return fetchWithRetry(`${GAS_URL}?${qs}`, {
+    method: "GET"
   });
-
-  const json = await res.json();
-  if (json && json.success === false) {
-    throw new Error(json.error || "Backend error");
-  }
-  return json;
 }
 
 export const API = {
@@ -72,8 +95,8 @@ export const API = {
     post("facultyGradeOverride", { trackId, regNo, challengeId, rawPoints }),
 
   // Leaderboard & Analytics
-  getLeaderboard: (trackId) => get("getLeaderboard", { trackId }),
-  getHistoricalAnalytics: () => get("getHistoricalAnalytics"),
+  getLeaderboard: (trackId, email) => get("getLeaderboard", { trackId, email: email || "" }),
+  getHistoricalAnalytics: (email) => get("getHistoricalAnalytics", { email }),
 
   // Helper utility for file uploads
   fileToBase64: (file) => {

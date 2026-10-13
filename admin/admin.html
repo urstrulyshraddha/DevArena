@@ -18,9 +18,9 @@
       <h2>Administrator Access</h2>
       <p>Authenticate with master university administrator credentials.</p>
 
-      <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="gate-form-wrap">
         <input type="password" id="adminGatePass" placeholder="Master admin password" autocomplete="current-password" />
-        <div id="gateError" style="color:#ff5555; font-size:0.75rem; min-height:1em;"></div>
+        <div id="gateError" class="gate-error-msg"></div>
         <button type="button" class="btn-white" id="adminGateSubmit">Unlock Console</button>
       </div>
     </div>
@@ -30,17 +30,19 @@
   <header class="admin-header">
     <div class="admin-brand">
       <span class="admin-badge">ADMIN</span>
-      <span class="admin-title">DevArena System Control</span>
-      <span class="admin-meta">· Shraddha Kondaveeti (Lead Dev)</span>
+      <div class="admin-title-wrap">
+        <span class="admin-title">DevArena System Control</span>
+        <span class="admin-meta">· Shraddha Kondaveeti (Lead Dev)</span>
+      </div>
     </div>
 
-    <div style="display:flex; align-items:center; gap:12px;">
-      <button type="button" class="admin-nav-link" id="purgeCacheBtn" style="cursor:pointer;">Purge System Cache</button>
+    <div class="admin-actions">
+      <button type="button" class="admin-nav-link" id="purgeCacheBtn">Purge System Cache</button>
       <a href="../index.html" class="admin-nav-link">← Return to Portal</a>
     </div>
   </header>
 
-  <!-- Main Layout (Stacked Architecture) -->
+  <!-- Main Layout -->
   <main class="admin-layout">
 
     <!-- Stats Banner -->
@@ -59,7 +61,7 @@
       </div>
       <div class="stat-card">
         <div class="label">Persistence Engine</div>
-        <div class="value" style="font-size:1.15rem; color:#22c55e;">Google Sheets DB</div>
+        <div class="value value-db">Google Sheets DB</div>
       </div>
     </div>
 
@@ -68,7 +70,7 @@
       <div class="panel-header">
         <div>
           <h2 class="panel-title">Provision Faculty &amp; Allocate Cohorts</h2>
-          <span style="font-size:0.75rem; color:var(--admin-text-muted);">Allocate faculty to single or multiple academic years &amp; sections</span>
+          <span class="panel-sub">Allocate faculty to single or multiple academic years &amp; sections</span>
         </div>
       </div>
 
@@ -91,10 +93,8 @@
 
         <!-- Dynamic Multi-Cohort Builder -->
         <div class="cohorts-section">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <label style="font-family:var(--font-mono); font-size:0.75rem; color:var(--admin-text-muted); text-transform:uppercase;">
-              Assigned Cohorts &amp; Sections (Multi-Allocation)
-            </label>
+          <div class="cohorts-header">
+            <label class="cohorts-label">Assigned Cohorts &amp; Sections (Multi-Allocation)</label>
             <button type="button" class="btn-small-outline" id="addCohortRowBtn">+ Add Another Cohort</button>
           </div>
 
@@ -114,8 +114,8 @@
           </div>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; flex-wrap:wrap; gap:12px;">
-          <p style="font-size:0.75rem; color:var(--admin-text-muted); margin:0;">
+        <div class="form-footer">
+          <p class="form-footer-hint">
             No password is set here. Faculty configure their own password on first login via Users_Auth.
           </p>
           <button type="submit" class="btn-white">+ Provision Faculty &amp; Sync Cohorts</button>
@@ -127,10 +127,10 @@
     <section class="panel">
       <div class="panel-header">
         <h2 class="panel-title">Approved Faculty &amp; Track Directory</h2>
-        <span style="font-size:0.72rem; color:var(--admin-text-muted); font-family:var(--font-mono);">LIVE GOOGLE SHEETS CATALOG</span>
+        <span class="panel-badge-mono">LIVE GOOGLE SHEETS CATALOG</span>
       </div>
 
-      <div style="overflow-x:auto;">
+      <div class="table-responsive-wrapper">
         <table class="faculty-table">
           <thead>
             <tr>

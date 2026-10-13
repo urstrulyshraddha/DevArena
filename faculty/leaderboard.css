@@ -1,0 +1,515 @@
+/* ==========================================================================
+   SRM DevArena — Faculty Leaderboard (faculty/leaderboard.css)
+   ========================================================================== */
+
+.leaderboard-layout {
+  max-width: 1360px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 28px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.leaderboard-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  margin: 0 0 4px;
+  color: var(--text);
+}
+
+.page-desc {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+/* Standardized Dark Dropdown for Leaderboard */
+.leaderboard-toolbar .form-select,
+#leaderboardTrackSelect {
+  height: 42px;
+  min-width: 250px;
+  padding: 0 38px 0 14px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #ffffff !important;
+  background-color: var(--surface-alt) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ffffff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 16px 16px !important;
+  transition: all var(--transition-fast);
+}
+
+#leaderboardTrackSelect:hover {
+  background-color: var(--surface) !important;
+  border-color: var(--border-strong) !important;
+}
+
+#leaderboardTrackSelect:focus {
+  border-color: var(--focus-ring) !important;
+  box-shadow: 0 0 0 3px rgba(63, 122, 201, 0.2) !important;
+}
+
+#leaderboardTrackSelect option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  padding: 10px 14px;
+}
+
+#leaderboardSearchInput {
+  height: 42px;
+  width: 240px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.86rem;
+  outline: none;
+}
+
+#leaderboardSearchInput:focus {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px rgba(63, 122, 201, 0.2);
+}
+
+/* Metric Cards */
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.summary-strip .stat-card {
+  padding: 18px 22px;
+  border-radius: var(--radius-lg);
+}
+
+/* Table Card & Fixed Column Alignment */
+.standings-card {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.standings-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-alt);
+}
+
+.standings-card__header h2 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.faculty-rank-table {
+  width: 100% !important;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.88rem;
+}
+
+.faculty-rank-table th {
+  background: var(--surface-alt);
+  padding: 14px 20px;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.faculty-rank-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.faculty-rank-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Fixed column distribution */
+.faculty-rank-table th:nth-child(1),
+.faculty-rank-table td:nth-child(1) {
+  width: 10%;
+  text-align: center;
+}
+
+.faculty-rank-table th:nth-child(2),
+.faculty-rank-table td:nth-child(2) {
+  width: 32%;
+  text-align: left;
+}
+
+.faculty-rank-table th:nth-child(3),
+.faculty-rank-table td:nth-child(3) {
+  width: 24%;
+  text-align: left;
+}
+
+.faculty-rank-table th:nth-child(4),
+.faculty-rank-table td:nth-child(4) {
+  width: 17%;
+  text-align: right;
+  padding-right: 32px;
+}
+
+.faculty-rank-table th:nth-child(5),
+.faculty-rank-table td:nth-child(5) {
+  width: 17%;
+  text-align: right;
+  padding-right: 32px;
+}
+
+.student-regno {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.94rem;
+  color: var(--text);
+}
+
+.student-subname {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.track-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  color: #cbd5e1;
+}
+
+.raw-points-val {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #38bdf8;
+}
+
+.converted-marks-val {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* --------------------------------------------------------------------------
+   CUSTOM TRACK DROPDOWN (Matches Faculty Workspace Theme)
+   -------------------------------------------------------------------------- */
+.track-dropdown {
+  position: relative;
+  min-width: 250px;
+}
+
+.track-dropdown__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  height: 40px;
+  padding: 0 14px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.track-dropdown__trigger:hover {
+  background: var(--surface);
+  border-color: var(--border-strong);
+}
+
+.track-dropdown.is-open .track-dropdown__trigger {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px rgba(63, 122, 201, 0.18);
+  background: var(--surface);
+}
+
+.track-dropdown__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-dropdown__chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.track-dropdown.is-open .track-dropdown__chevron {
+  transform: rotate(180deg);
+}
+
+/* Floating Options Container */
+.track-dropdown__menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 120;
+  padding: 6px;
+  animation: dropIn 0.15s ease forwards;
+}
+
+:root[data-theme="dark"] .track-dropdown__menu {
+  background: #111a2c;
+  border-color: #243552;
+}
+
+.track-dropdown.is-open .track-dropdown__menu {
+  display: block;
+}
+
+/* Option Row */
+.track-dropdown__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.track-dropdown__option:hover {
+  background: var(--surface-sunken);
+  color: #38bdf8;
+}
+
+:root[data-theme="dark"] .track-dropdown__option:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #93c5fd;
+}
+
+.track-dropdown__option.is-selected {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.track-dropdown__option-icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  flex-shrink: 0;
+}
+
+.track-dropdown__option.is-selected .track-dropdown__option-icon {
+  background: #38bdf8;
+}
+
+#studentSearchInput, #leaderboardSearchInput {
+  height: 40px;
+  width: 240px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.86rem;
+  outline: none;
+}
+
+/* --------------------------------------------------------------------------
+   HEADER PROFILE BADGE ENHANCEMENTS
+   -------------------------------------------------------------------------- */
+.profile-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.profile-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px 6px 16px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text);
+  font-family: var(--font-body);
+  user-select: none;
+}
+
+.profile-trigger:hover {
+  background: var(--surface-sunken);
+  border-color: var(--border-strong);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+}
+
+.profile-badge:has(.profile-dropdown.open) .profile-trigger {
+  border-color: var(--focus-ring);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(63, 122, 201, 0.18);
+}
+
+.profile-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.profile-name {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.profile-track {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-top: 1px;
+}
+
+.profile-chevron-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+
+.profile-trigger:hover .profile-chevron-box {
+  background: var(--surface-alt);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.profile-chevron {
+  display: block;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.profile-badge:has(.profile-dropdown.open) .profile-chevron-box {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.profile-badge:has(.profile-dropdown.open) .profile-chevron {
+  transform: rotate(180deg);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-modal);
+  min-width: 190px;
+  padding: 6px;
+  display: none;
+  z-index: 60;
+}
+
+.profile-dropdown.open {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-dropdown button {
+  width: 100%;
+  text-align: left;
+  padding: 9px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  font-size: 0.84rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.profile-dropdown button:hover {
+  background: var(--surface-sunken);
+}
+
+.danger-item {
+  color: var(--danger) !important;
+}
+
+.danger-item:hover {
+  background: var(--danger-tint) !important;
+}

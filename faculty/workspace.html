@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SRM DevArena — Faculty Oversight Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="workspace.css" />
+</head>
+<body data-page="faculty-workspace" data-role="faculty">
+
+  <header class="app-header">
+    <div class="brand">
+      <img src="../assets/srmaplogo.png" alt="SRM University-AP" class="brand-seal" />
+      <div class="brand-copy">
+        <div class="brand-name">SRM DevArena</div>
+        <div class="brand-sub">SRM University-AP · Academic Coding Portal</div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <nav class="site-nav">
+        <a href="workspace.html" class="active">Workspace</a>
+        <a href="leaderboard.html">Leaderboard</a>
+      </nav>
+
+      <button class="theme-toggle" id="themeToggleBtn" type="button" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41-1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+
+      <div class="profile-badge" id="profileBadge">
+        <button class="profile-trigger" id="facultyMenuBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Faculty profile menu">
+          <div class="profile-meta">
+            <span class="profile-name" id="facultyName">Faculty</span>
+            <span class="profile-track" id="facultyEmail">faculty@srmap.edu.in</span>
+          </div>
+          <span class="profile-chevron-box" aria-hidden="true">
+            <svg class="profile-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </span>
+        </button>
+        <div class="profile-dropdown" id="facultyDropdown">
+          <button id="logoutBtn" class="danger-item" type="button">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="workspace-shell">
+    <!-- Faculty Banner -->
+    <section class="faculty-banner">
+      <div class="faculty-banner-copy">
+        <div class="eyebrow" id="facultyConsoleEyebrow">SRM Faculty Oversight Console</div>
+        <h1 id="facultyBannerName">—</h1>
+        <div class="faculty-banner-meta" id="facultyBannerMeta">—</div>
+      </div>
+
+      <div class="faculty-banner-actions">
+        <div class="track-picker">
+          <label for="wsTrackDropdownTrigger">Active Challenge Track:</label>
+          <div class="track-dropdown" id="wsTrackDropdownWidget">
+            <button class="track-dropdown__trigger" id="wsTrackDropdownTrigger" type="button" aria-haspopup="listbox">
+              <span class="track-dropdown__label" id="wsTrackDropdownLabel">Select Track</span>
+              <svg class="track-dropdown__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="track-dropdown__menu" id="wsTrackDropdownMenu" role="listbox"></div>
+          </div>
+        </div>
+        <button class="btn btn-forest" id="openTrackModalBtn" type="button">+ Create Challenge Track</button>
+      </div>
+    </section>
+
+    <!-- Faculty Workspace Grid -->
+    <div class="faculty-layout">
+      <!-- Left Column: Tasks Navigation -->
+      <aside class="faculty-left">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-titles">
+              <h3>Tasks in Track</h3>
+              <span class="text-xs text-muted" id="challengeCountBadge">0 configured</span>
+            </div>
+            <button class="btn btn-outline btn-sm" id="openTaskModalBtn" type="button">+ New Task</button>
+          </div>
+          <div class="card-body">
+            <div class="task-list" id="taskList"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Student Re-Review Requests</h3>
+          </div>
+          <div class="card-body">
+            <p class="text-xs text-muted" id="noReReviewMsg">No pending re-review requests.</p>
+            <div id="reReviewList"></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Column: Submissions Table -->
+      <section class="faculty-right">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-titles">
+              <h3 id="tableTitle">All Submissions</h3>
+              <span class="text-xs text-muted" id="tableSubtitle">Real-time status overview</span>
+            </div>
+            <div class="card-header-actions">
+              <button class="btn btn-sm" id="triggerAiReviewBtn" type="button">⚡ Trigger Automated AI Review</button>
+            </div>
+          </div>
+
+          <div class="faculty-table-container">
+            <table class="faculty-table">
+              <thead>
+                <tr>
+                  <th scope="col" class="col-student">Student</th>
+                  <th scope="col" class="col-status">Status / Stage</th>
+                  <th scope="col" class="col-date">Submitted</th>
+                  <th scope="col" class="col-artifact">Submitted File</th>
+                  <th scope="col" class="col-pts">Awarded Pts</th>
+                  <th scope="col" class="col-marks">Converted Marks</th>
+                  <th scope="col" class="col-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="submissionsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Create Task Modal -->
+  <div class="modal-overlay" id="taskModal" hidden>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Create New Challenge Task</h3>
+        <button class="btn btn-outline btn-sm close-modal" type="button" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="newTaskTitle">Task Title</label>
+          <input type="text" id="newTaskTitle" class="form-input" placeholder="e.g. Invert a Binary Tree" />
+        </div>
+        <div class="form-group">
+          <label for="newTaskStatement">Problem Statement</label>
+          <textarea id="newTaskStatement" class="form-input" rows="4" placeholder="Detail specifications, stdin format, and stdout expectations..."></textarea>
+        </div>
+        <div class="modal-field-row">
+          <div class="form-group">
+            <label for="newTaskPoints">Max Points</label>
+            <input type="number" id="newTaskPoints" class="form-input" value="10" />
+          </div>
+          <div class="form-group">
+            <label for="newTaskDeadline">Deadline</label>
+            <input type="datetime-local" id="newTaskDeadline" class="form-input" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline close-modal" type="button">Cancel</button>
+        <button class="btn btn-primary" id="saveTaskBtn" type="button">Publish Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Track Modal -->
+  <div class="modal-overlay" id="trackModal" hidden>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Create Challenge Track</h3>
+        <button class="btn btn-outline btn-sm close-modal" type="button" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="newTrackId">Track ID (Slug)</label>
+          <input type="text" id="newTrackId" class="form-input" placeholder="e.g. c2t-y2-aimlf" />
+        </div>
+        <div class="form-group">
+          <label for="newTrackName">Track Name</label>
+          <input type="text" id="newTrackName" class="form-input" placeholder="e.g. Code2Think Advanced" />
+        </div>
+        <div class="modal-field-row">
+          <div class="form-group">
+            <label for="newTrackYear">Academic Year</label>
+            <input type="text" id="newTrackYear" class="form-input" placeholder="e.g. 2nd Year" />
+          </div>
+          <div class="form-group">
+            <label for="newTrackSection">Section</label>
+            <input type="text" id="newTrackSection" class="form-input" placeholder="e.g. AIML-F" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline close-modal" type="button">Cancel</button>
+        <button class="btn btn-forest" id="saveTrackBtn" type="button">Create Track</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inspect Code & Grade Modal -->
+  <div class="modal-overlay" id="inspectModal" hidden>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="inspectTitle">Evaluate Submission</h3>
+        <button class="btn btn-outline btn-sm close-modal" type="button" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Submitted Source Code</label>
+          <pre class="code-preview-box font-mono" id="inspectCodePreview">// Code will appear here...</pre>
+        </div>
+        <div class="form-group">
+          <label for="overridePointsInput">Override / Award Points (0 - 10)</label>
+          <input type="number" id="overridePointsInput" class="form-input font-mono" min="0" max="10" step="0.5" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline close-modal" type="button">Cancel</button>
+        <button class="btn btn-primary" id="saveOverrideGradeBtn" type="button">Confirm &amp; Award Marks</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="workspace.js"></script>
+</body>
+</html>

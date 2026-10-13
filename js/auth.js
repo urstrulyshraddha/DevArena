@@ -28,7 +28,7 @@ export function clearSession() {
   window.location.reload();
 }
 
-// Backwards-compatibility alias
+// Backwards-compatibility aliases
 export const getSession = loadSession;
 export const setSession = saveSession;
 
@@ -45,6 +45,7 @@ export function initProfileBadge(session, options = {}) {
   const menuBtn = document.getElementById("profileMenuBtn");
   const dropdown = document.getElementById("profileDropdown");
   const logoutBtn = document.getElementById("logoutBtn");
+  const switchTrackBtn = document.getElementById("switchTrackBtn");
 
   badge.removeAttribute("hidden");
 
@@ -57,6 +58,8 @@ export function initProfileBadge(session, options = {}) {
       trackEl.textContent = session.trackName
         ? `${session.trackName} · ${session.section || session.academicYear || ''}`
         : (session.regNo || "Student");
+    } else if (session.role === "admin") {
+      trackEl.textContent = "Platform Administrator";
     } else {
       trackEl.textContent = session.title || "Faculty Console";
     }
@@ -81,13 +84,19 @@ export function initProfileBadge(session, options = {}) {
       }
     };
   }
+
+  if (switchTrackBtn) {
+    switchTrackBtn.onclick = () => {
+      clearSession();
+    };
+  }
 }
 
 /* --------------------------------------------------------------------------
-   SELECT ENHANCEMENT (Optional helper)
+   SELECT ENHANCEMENT
    -------------------------------------------------------------------------- */
 export function enhanceAllSelects() {
-  // Retained so workspace/main callers do not throw
+  // Retained for cross-module compatibility
 }
 
 /* --------------------------------------------------------------------------
@@ -109,7 +118,7 @@ export function initOnboarding(portalConfig, onProceed) {
   const mentorSelect = document.getElementById("mentorSelect");
   const routePreviewText = document.getElementById("routePreviewText");
 
-  // Faculty inputs
+  // Faculty / Admin inputs
   const facultySelectField = document.getElementById("facultySelectField");
   const facultyEmailInput = document.getElementById("facultyEmailInput");
   const facultyPasswordInput = document.getElementById("facultyPasswordInput");
@@ -131,7 +140,7 @@ export function initOnboarding(portalConfig, onProceed) {
     banner.style.display = "none";
   }
 
-  /* ── 1. Role Tabs Switching (Student vs Faculty) ── */
+  /* ── 1. Role Tabs Switching (Student vs Faculty/Admin) ── */
   roleTabs.forEach(tab => {
     tab.addEventListener("click", () => {
       clearBanner();
@@ -170,12 +179,12 @@ export function initOnboarding(portalConfig, onProceed) {
     yearSelect.addEventListener("change", updateRoutePreview);
   }
 
-  /* ── 4. Populate Mentors & Faculty Dropdowns from Authoritative Catalog ── */
-  const activeFacultyList = faculties.filter(f => f.role === "faculty" || !f.role);
+  /* ── 4. Populate Mentors (Teaching Faculty Only) ── */
+  const mentorList = faculties.filter(f => f.role === "faculty" || !f.role);
 
   if (mentorSelect) {
     mentorSelect.innerHTML = `<option value="" disabled selected>Select Faculty Mentor</option>`;
-    activeFacultyList.forEach(fac => {
+    mentorList.forEach(fac => {
       const opt = document.createElement("option");
       opt.value = fac.id;
       opt.textContent = `${fac.name} (${fac.title || 'Faculty'})`;
@@ -204,14 +213,24 @@ export function initOnboarding(portalConfig, onProceed) {
     }
   }
 
+  /* ── 5. Populate Account Dropdown (Faculty + Administrator) ── */
   if (facultySelectField) {
     facultySelectField.innerHTML = `<option value="" disabled selected>Choose your account</option>`;
-    activeFacultyList.forEach(fac => {
+
+    // Place Admin accounts first, followed by faculty
+    const sortedAccounts = [...faculties].sort((a, b) => {
+      if (a.role === "admin" && b.role !== "admin") return -1;
+      if (b.role === "admin" && a.role !== "admin") return 1;
+      return 0;
+    });
+
+    sortedAccounts.forEach(acc => {
       const opt = document.createElement("option");
-      opt.value = fac.email;
-      opt.dataset.id = fac.id;
-      opt.dataset.name = fac.name;
-      opt.textContent = `${fac.name} (${fac.title || 'Faculty'})`;
+      opt.value = acc.email;
+      opt.dataset.id = acc.id;
+      opt.dataset.name = acc.name;
+      opt.dataset.role = acc.role || "faculty";
+      opt.textContent = `${acc.name} (${acc.title || (acc.role === 'admin' ? 'Admin' : 'Faculty')})`;
       facultySelectField.appendChild(opt);
     });
 
@@ -222,7 +241,7 @@ export function initOnboarding(portalConfig, onProceed) {
     });
   }
 
-  /* ── 5. Form Submission (Live Auth) ── */
+  /* ── 6. Form Submission (Live Auth) ── */
   if (form) {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -275,7 +294,7 @@ export function initOnboarding(portalConfig, onProceed) {
             mentorId
           });
 
-          if (res.success) {
+          if (res && res.success) {
             const session = {
               role: "student",
               studentId: regNo,
@@ -297,7 +316,7 @@ export function initOnboarding(portalConfig, onProceed) {
               window.location.reload();
             }
           } else {
-            showBanner(res.error || "Student validation failed.");
+            showBanner(res?.error || "Student validation failed.");
           }
         } catch (err) {
           showBanner(err.message || "Failed to contact validation server.");
@@ -308,7 +327,7 @@ export function initOnboarding(portalConfig, onProceed) {
           }
         }
 
-      /* ── Faculty Flow ── */
+      /* ── Faculty / Admin Flow ── */
       } else {
         const email = (facultyEmailInput?.value || facultySelectField?.value || "").trim().toLowerCase();
         const password = facultyPasswordInput?.value.trim();
@@ -318,6 +337,9 @@ export function initOnboarding(portalConfig, onProceed) {
           return;
         }
 
+        const selectedOption = facultySelectField?.selectedOptions[0];
+        const selectedRole = selectedOption?.dataset?.role || "faculty";
+
         const submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) {
           submitBtn.disabled = true;
@@ -325,16 +347,16 @@ export function initOnboarding(portalConfig, onProceed) {
         }
 
         try {
-          const res = await API.facultyAuth(email, password, "faculty");
+          const res = await API.facultyAuth(email, password, selectedRole);
 
-          if (res.success) {
-            const f = res.faculty;
+          if (res && res.success) {
+            const f = res.faculty || {};
             const session = {
-              role: f.role || "faculty",
-              facultyId: f.id,
-              name: f.name,
-              email: f.email,
-              title: f.title
+              role: f.role || selectedRole,
+              facultyId: f.id || selectedOption?.dataset?.id || "faculty",
+              name: f.name || "Faculty Member",
+              email: f.email || email,
+              title: f.title || ""
             };
 
             saveSession(session);
@@ -344,7 +366,7 @@ export function initOnboarding(portalConfig, onProceed) {
               window.location.reload();
             }
           } else {
-            showBanner(res.error || "Invalid faculty credentials.");
+            showBanner(res?.error || "Invalid credentials.");
           }
         } catch (err) {
           showBanner(err.message || "Server authentication error.");
