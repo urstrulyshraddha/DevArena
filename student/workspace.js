@@ -69,12 +69,12 @@ function enforceAntiCheating() {
 
       if (isCmdOrCtrl && (key === "v" || key === "c" || key === "x")) {
         e.preventDefault();
-        toast(`⚠️ Shortcut Ctrl+${key.toUpperCase()} is disabled.`);
+        toast(`⚠️ Further attempts of cheating will raise trigger in faculty dashboard.`);
       }
 
       if ((e.shiftKey && e.key === "Insert") || (e.ctrlKey && e.key === "Insert")) {
         e.preventDefault();
-        toast("⚠️ Clipboard shortcuts are disabled.");
+        toast("⚠️ Further attempts of cheating will raise trigger in faculty dashboard.");
       }
     });
   });
@@ -118,7 +118,7 @@ async function boot() {
     window.location.href = "../index.html";
   });
 
-  // 3. Resolve Track & Mentor Information
+  // 3. Resolve Exact Track & Mentor Information
   let portalData = null;
   try {
     portalData = await API.getPortalConfig();
@@ -127,19 +127,47 @@ async function boot() {
   }
 
   const faculties = portalData?.faculties || [];
-  const mentor = faculties.find((f) => f.id === session.mentorId || f.email === session.mentorId) || {
-    name: "Dr. Yasir Afaq",
-    title: "Faculty Mentor",
-    tracks: [{ id: "c2t-y1-aimlf", name: "Code2Think", year: "1st Year", section: "AIML-F" }]
-  };
+  let mentor = faculties.find((f) => f.id === session.mentorId || f.email === session.mentorId);
 
-  const assignedTrack = (mentor.tracks && mentor.tracks.length > 0)
-    ? mentor.tracks[0]
-    : { id: "c2t-y1-aimlf", name: "Code2Think", year: session.academicYear || "1st Year" };
+  // Strictly look up session.trackId
+  let assignedTrack = null;
+  if (session.trackId) {
+    for (const f of faculties) {
+      const found = (f.tracks || []).find((t) => t.id === session.trackId);
+      if (found) {
+        assignedTrack = found;
+        if (!mentor) mentor = f;
+        break;
+      }
+    }
+  }
 
-  document.getElementById("trackBannerName").textContent = assignedTrack.name;
-  document.getElementById("trackBannerDesc").textContent = `${assignedTrack.year || ''} · ${assignedTrack.section || ''}`;
-  document.getElementById("trackBannerMentor").textContent = `Mentored by ${mentor.name} (${mentor.title || 'Faculty'})`;
+  // If not found in dynamic catalog, build directly from session
+  if (!assignedTrack) {
+    assignedTrack = {
+      id: session.trackId,
+      name: session.trackName || "Assigned Track",
+      year: session.academicYear || "1st Year",
+      section: ""
+    };
+  }
+
+  if (!mentor) {
+    mentor = { name: "Faculty Mentor", title: "Assistant Professor" };
+  }
+
+  const trackBannerName = document.getElementById("trackBannerName");
+  const trackBannerDesc = document.getElementById("trackBannerDesc");
+  const trackBannerMentor = document.getElementById("trackBannerMentor");
+
+  if (trackBannerName) trackBannerName.textContent = assignedTrack.name;
+  if (trackBannerDesc) {
+    const secStr = assignedTrack.section ? ` · ${assignedTrack.section}` : "";
+    trackBannerDesc.textContent = `${assignedTrack.year || session.academicYear || ''}${secStr}`;
+  }
+  if (trackBannerMentor) {
+    trackBannerMentor.textContent = `Mentored by ${mentor.name} (${mentor.title || 'Faculty'})`;
+  }
 
   let challenges = [];
   let userSubmissions = [];
@@ -222,25 +250,80 @@ async function boot() {
     renderStepper(sub);
     renderSampleCasesDisplay(activeChallenge.sampleTests || []);
 
-    // Set defaults into the student test execution textareas if empty
+    // ── Clean Slate Reset: Keep student fields completely empty for custom runs ──
     const inputField = document.getElementById("studentTestInput");
     const outputField = document.getElementById("studentTestOutput");
-    if (activeChallenge.sampleTests && activeChallenge.sampleTests.length > 0) {
-      if (inputField && !inputField.value.trim()) {
-        inputField.value = activeChallenge.sampleTests.map(t => t.input).join("\n");
-      }
-      if (outputField && !outputField.value.trim()) {
-        outputField.value = activeChallenge.sampleTests.map(t => t.expectedOutput).join("\n");
-      }
-    }
+    const reflField = document.getElementById("reflectionArea");
+    const codeField = document.getElementById("codeEditor");
+
+    if (inputField) inputField.value = "";
+    if (outputField) outputField.value = "";
+    if (reflField) reflField.value = "";
+    if (codeField && !sub) codeField.value = "";
+
+    // Reset attached PDF chip if switching tasks
+    attachedPdfBase64 = null;
+    attachedPdfName = null;
+    const pdfInput = document.getElementById("pdfFileInput");
+    if (pdfInput) pdfInput.value = "";
+    document.getElementById("reflectionFileChipWrap")?.setAttribute("hidden", "");
 
     const submitBtn = document.getElementById("submitBtn");
-    if (sub && sub.status === "Evaluated") {
-      submitBtn.textContent = "Submission Evaluated";
-      submitBtn.disabled = true;
+    let viewReportBtn = document.getElementById("viewReportBtn");
+
+    // Dynamic View Report button injection next to submit button
+    if (!viewReportBtn && submitBtn && submitBtn.parentNode) {
+      viewReportBtn = document.createElement("button");
+      viewReportBtn.type = "button";
+      viewReportBtn.id = "viewReportBtn";
+      viewReportBtn.className = "btn btn-outline";
+      viewReportBtn.style.marginRight = "10px";
+      viewReportBtn.textContent = "📋 View Evaluation Report";
+      submitBtn.parentNode.insertBefore(viewReportBtn, submitBtn);
+    }
+
+    // ── Strict Deadline Check ──
+    const now = new Date();
+    const deadlineDate = activeChallenge.deadline ? new Date(activeChallenge.deadline) : null;
+    const isExpired = deadlineDate && !isNaN(deadlineDate.getTime()) && now > deadlineDate;
+
+    if (sub && (sub.status === "Evaluated" || sub.status === "Re-Review Requested")) {
+      if (viewReportBtn) {
+        viewReportBtn.style.display = "inline-flex";
+        viewReportBtn.onclick = () => openStudentReportModal(activeChallenge.id);
+      }
+      if (submitBtn) {
+        if (isExpired) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Deadline Passed";
+          submitBtn.classList.remove("btn-primary");
+          submitBtn.classList.add("btn-outline");
+          submitBtn.title = `Submissions closed on ${deadlineDate.toLocaleString()}`;
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Resubmit Solution";
+          submitBtn.classList.add("btn-primary");
+          submitBtn.classList.remove("btn-outline");
+          submitBtn.title = "";
+        }
+      }
     } else {
-      submitBtn.textContent = sub ? "Resubmit Solution & Reflection" : "Submit Solution & Reflection";
-      submitBtn.disabled = false;
+      if (viewReportBtn) viewReportBtn.style.display = "none";
+      if (submitBtn) {
+        if (isExpired) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Deadline Passed";
+          submitBtn.classList.remove("btn-primary");
+          submitBtn.classList.add("btn-outline");
+          submitBtn.title = `Submissions closed on ${deadlineDate.toLocaleString()}`;
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.textContent = sub ? "Resubmit Solution & Reflection" : "Submit Solution & Reflection";
+          submitBtn.classList.add("btn-primary");
+          submitBtn.classList.remove("btn-outline");
+          submitBtn.title = "";
+        }
+      }
     }
   }
 
@@ -262,17 +345,23 @@ async function boot() {
         <div class="step-marker">2</div>
         <div>
           <div class="step-title">Automated &amp; Mentor Review</div>
-          <div class="step-desc">${stage === 'Submitted' ? 'Under Review' : 'Pending submission'}</div>
+          <div class="step-desc">${stage === 'Submitted' ? 'Under Review' : (stage === 'Re-Review Requested' ? 'Re-Evaluation Queued' : 'Pending submission')}</div>
         </div>
       </li>
-      <li class="${stage === 'Evaluated' ? 'completed' : ''}">
+      <li class="${stage === 'Evaluated' ? 'completed' : ''}" style="${stage === 'Evaluated' ? 'cursor:pointer;' : ''}" id="stepperGradeStep">
         <div class="step-marker">3</div>
         <div>
           <div class="step-title">Graded &amp; Finalized</div>
-          <div class="step-desc">${stage === 'Evaluated' ? `Awarded: ${sub.pointsEarned} pts` : 'Awaiting grading'}</div>
+          <div class="step-desc">${stage === 'Evaluated' ? `Awarded: ${sub.pointsEarned} pts (Click for report)` : 'Awaiting grading'}</div>
         </div>
       </li>
     `;
+
+    if (stage === "Evaluated") {
+      document.getElementById("stepperGradeStep")?.addEventListener("click", () => {
+        if (activeChallenge) openStudentReportModal(activeChallenge.id);
+      });
+    }
   }
 
   // 9. Render Configured Sample Cases as Read-Only Reference Cards
@@ -346,38 +435,74 @@ async function boot() {
     });
   });
 
-  // 12. Submit Pipeline (Writes Header, Code, Reflection, Tests to Single File)
+  // 12. Submit Pipeline (Strict Mandatory Gating on Code, Input, Output & Reflection)
   document.getElementById("submitBtn")?.addEventListener("click", async () => {
-    const code = document.getElementById("codeEditor").value.trim();
-    const reflectionText = document.getElementById("reflectionArea").value.trim();
+    const code = document.getElementById("codeEditor")?.value.trim() || "";
     const studentInput = document.getElementById("studentTestInput")?.value.trim() || "";
     const studentOutput = document.getElementById("studentTestOutput")?.value.trim() || "";
+    const reflectionText = document.getElementById("reflectionArea")?.value.trim() || "";
 
+    // ── Field 1: Code Solution ──
     if (!code) {
-      toast("Please enter your solution code before submitting.");
+      toast("⚠️ Code Solution is required before submitting.");
+      document.getElementById("codeEditor")?.focus();
       return;
+    }
+
+    // ── Field 2: Test Case Input (stdin) ──
+    if (!studentInput) {
+      toast("⚠️ Test Case Inputs (stdin) cannot be empty.");
+      document.getElementById("studentTestInput")?.focus();
+      return;
+    }
+
+    // ── Field 3: Expected / Observed Output (stdout) ──
+    if (!studentOutput) {
+      toast("⚠️ Expected / Observed Output (stdout) cannot be empty.");
+      document.getElementById("studentTestOutput")?.focus();
+      return;
+    }
+
+    // ── Field 4: Reflection (Text or attached PDF) ──
+    if (!reflectionText && !attachedPdfBase64) {
+      toast("⚠️ Reflection is mandatory. Provide written notes or attach a PDF.");
+      document.getElementById("reflectionArea")?.focus();
+      return;
+    }
+
+    if (reflectionText.length < 15 && !attachedPdfBase64) {
+      toast("⚠️ Reflection must be at least 15 characters explaining your approach.");
+      document.getElementById("reflectionArea")?.focus();
+      return;
+    }
+
+    const sub = userSubmissions.find((s) => String(s.challengeId) === String(activeChallenge.id));
+    if (sub && sub.status === "Evaluated") {
+      if (!confirm("You have already received marks for this task. Submitting again will update your solution file on Drive. Proceed?")) {
+        return;
+      }
     }
 
     const submitBtn = document.getElementById("submitBtn");
     submitBtn.disabled = true;
     submitBtn.textContent = "Submitting to Drive & Sheets...";
 
-    // Assemble the student test verification summary
     const testRunSummary =
 `[STUDENT VERIFIED TEST CASES]
 INPUT (stdin):
-${studentInput || 'None provided'}
+${studentInput}
 
 OUTPUT (stdout):
-${studentOutput || 'None provided'}`;
+${studentOutput}`;
 
     const payload = {
       challengeId: activeChallenge.id,
       studentId: session.regNo,
+      regNo: session.regNo,
       trackId: assignedTrack.id,
-      trackYear: assignedTrack.year || "1st Year",
+      trackYear: assignedTrack.year || session.academicYear || "1st Year",
       facultyName: mentor.name,
-      language: document.getElementById("langSelect").value,
+      language: document.getElementById("langSelect")?.value || "c",
       code: code,
       reflectionText: reflectionText,
       testRunSummary: testRunSummary,
@@ -393,15 +518,100 @@ ${studentOutput || 'None provided'}`;
         renderChallengeList();
         updateMarksChip();
       } else {
-        toast(res.error || "Submission failed.");
+        toast(res?.error || "Submission failed.");
       }
     } catch (err) {
       toast("Submission error: " + err.message);
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Submit Solution & Reflection";
+      submitBtn.textContent = sub ? "Resubmit Solution" : "Submit Solution & Reflection";
     }
   });
+
+  //13. ── Student Feedback Modal Wiring ──
+    const feedbackModal = document.getElementById("feedbackModal");
+    const openFeedbackBtn = document.getElementById("openFeedbackModalBtn");
+    const closeFeedbackBtn = document.getElementById("closeFeedbackModalBtn");
+    const cancelFeedbackBtn = document.getElementById("cancelFeedbackModalBtn");
+    const submitFeedbackBtn = document.getElementById("submitFeedbackBtn");
+    const feedbackImgInput = document.getElementById("feedbackImgInput");
+    const feedbackImgNameLabel = document.getElementById("feedbackImgFileName");
+
+    let feedbackImageBase64 = null;
+    let feedbackImageName = null;
+    let feedbackImageMime = null;
+
+    feedbackImgInput?.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        feedbackImageBase64 = await API.fileToBase64(file);
+        feedbackImageName = file.name;
+        feedbackImageMime = file.type;
+        if (feedbackImgNameLabel) feedbackImgNameLabel.textContent = file.name;
+      } catch (err) {
+        toast("Could not read screenshot.");
+      }
+    });
+
+    const hideFeedbackModal = () => {
+      if (feedbackModal) feedbackModal.hidden = true;
+    };
+
+    openFeedbackBtn?.addEventListener("click", () => {
+      if (feedbackModal) feedbackModal.hidden = false;
+    });
+
+    closeFeedbackBtn?.addEventListener("click", hideFeedbackModal);
+    cancelFeedbackBtn?.addEventListener("click", hideFeedbackModal);
+
+    submitFeedbackBtn?.addEventListener("click", async () => {
+      const title = document.getElementById("feedbackTitleInput")?.value.trim() || "";
+      const type = document.getElementById("feedbackTypeInput")?.value.trim() || "";
+      const description = document.getElementById("feedbackMessageArea")?.value.trim() || "";
+
+      if (!title || !description) {
+        toast("⚠️ Title and description are required.");
+        return;
+      }
+
+      submitFeedbackBtn.disabled = true;
+      submitFeedbackBtn.textContent = "Submitting...";
+
+      try {
+        const res = await API.submitFeedback({
+          role: "student",
+          userId: session.regNo,
+          trackId: assignedTrack.id,
+          challengeId: activeChallenge?.id || "N/A",
+          problemTitle: title,
+          problemType: type || "General Problem",
+          description: description,
+          imageBase64: feedbackImageBase64,
+          imageName: feedbackImageName,
+          imageMime: feedbackImageMime
+        });
+
+        if (res && res.success) {
+                toast("Your feedback has been sent to Admin and will be resolved accordingly.");
+                alert("✅ Your feedback has been sent to Admin and will be resolved accordingly.\nTicket ID: " + (res.ticketId || "Logged"));
+                hideFeedbackModal();
+                document.getElementById("feedbackTitleInput").value = "";
+                document.getElementById("feedbackTypeInput").value = "";
+                document.getElementById("feedbackMessageArea").value = "";
+                if (feedbackImgNameLabel) feedbackImgNameLabel.textContent = "No screenshot selected";
+                feedbackImageBase64 = null;
+              } else {
+                toast("Failed: " + (res?.error || "Server error"));
+                alert("Failed to submit report: " + (res?.error || "Unknown server response"));
+              }
+      } catch (err) {
+        toast("Error: " + err.message);
+      } finally {
+        submitFeedbackBtn.disabled = false;
+        submitFeedbackBtn.textContent = "Submit Report";
+      }
+    });
 
   // Initial Load
   await loadData();
@@ -411,56 +621,170 @@ ${studentOutput || 'None provided'}`;
 }
 
 // ── Language-Aware Code File Attachment & Import ──
-  const langSelect = document.getElementById("langSelect");
-  const codeFileInput = document.getElementById("codeFileInput");
-  const codeUploadExtLabel = document.getElementById("codeUploadExtLabel");
-  const codeEditor = document.getElementById("codeEditor");
+const langSelect = document.getElementById("langSelect");
+const codeFileInput = document.getElementById("codeFileInput");
+const codeUploadExtLabel = document.getElementById("codeUploadExtLabel");
+const codeEditor = document.getElementById("codeEditor");
 
-  const extMap = {
-    python: { ext: ".py", accept: ".py" },
-    c: { ext: ".c", accept: ".c" },
-    cpp: { ext: ".cpp", accept: ".cpp,.cc,.cxx" },
-    java: { ext: ".java", accept: ".java" }
+const extMap = {
+  python: { ext: ".py", accept: ".py" },
+  c: { ext: ".c", accept: ".c" },
+  cpp: { ext: ".cpp", accept: ".cpp,.cc,.cxx" },
+  java: { ext: ".java", accept: ".java" }
+};
+
+langSelect?.addEventListener("change", (e) => {
+  const lang = e.target.value;
+  const config = extMap[lang] || { ext: ".py", accept: ".py" };
+  if (codeFileInput) codeFileInput.accept = config.accept;
+  if (codeUploadExtLabel) codeUploadExtLabel.textContent = config.ext;
+});
+
+codeFileInput?.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const currentLang = langSelect ? langSelect.value : "python";
+  const allowed = extMap[currentLang] || extMap.python;
+  const fileExt = "." + file.name.split(".").pop().toLowerCase();
+
+  if (!allowed.accept.split(",").includes(fileExt)) {
+    toast(`⚠️ Invalid extension. Selected language (${currentLang}) expects ${allowed.ext}`);
+    codeFileInput.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const codeText = event.target.result;
+    if (codeEditor) {
+      codeEditor.value = codeText;
+      toast(`Loaded ${file.name} successfully.`);
+    }
+  };
+  reader.onerror = () => {
+    toast("Error reading the code file.");
   };
 
-  // Synchronize file input accept filter when language changes
-  langSelect?.addEventListener("change", (e) => {
-    const lang = e.target.value;
-    const config = extMap[lang] || { ext: ".py", accept: ".py" };
-    if (codeFileInput) codeFileInput.accept = config.accept;
-    if (codeUploadExtLabel) codeUploadExtLabel.textContent = config.ext;
-  });
+  reader.readAsText(file);
+});
 
-  // Read uploaded source file directly into the code editor
-  codeFileInput?.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+// ── Open Student Report & Review Modal ──
+async function openStudentReportModal(challengeId) {
+  const session = JSON.parse(localStorage.getItem("devarena.session") || "{}");
+  const modal = document.getElementById("studentReportModal");
+  if (!modal) return;
 
-    const currentLang = langSelect ? langSelect.value : "python";
-    const allowed = extMap[currentLang] || extMap.python;
-    const fileExt = "." + file.name.split(".").pop().toLowerCase();
+  const trackId = session.trackId || "c2t-y1-aimlf";
+  const regNo = session.regNo;
 
-    // Extension validation
-    if (!allowed.accept.split(",").includes(fileExt)) {
-      toast(`⚠️ Invalid extension. Selected language (${currentLang}) expects ${allowed.ext}`);
-      codeFileInput.value = "";
+  try {
+    const res = await API.getStudentSubmissionReport(trackId, regNo, challengeId);
+    if (!res || !res.success) {
+      alert(res?.error || "Submission record not found for this task.");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const codeText = event.target.result;
-      if (codeEditor) {
-        codeEditor.value = codeText;
-        toast(`Loaded ${file.name} successfully.`);
+    const sub = res.report;
+    const rubric = sub.rubric || {};
+
+    document.getElementById("reportModalTitle").textContent = `Task ${challengeId.toUpperCase()} Assessment`;
+    document.getElementById("reportRawScore").textContent = `${sub.rawPoints} / 10`;
+    document.getElementById("reportConvertedMark").textContent = `${sub.convertedMarks} / 5.00`;
+    document.getElementById("reportStatusBadge").innerHTML = `<span class="status-pill pill-done">${escapeHtml(sub.status)}</span>`;
+    document.getElementById("reportVerdict").textContent = rubric.verdict || "No specific comments recorded.";
+    document.getElementById("reportGuidance").textContent = rubric.pedagogical_advice || "Review the lab notes for reference solutions.";
+
+    // Render Strengths
+    const strengthsEl = document.getElementById("reportStrengthsList");
+    strengthsEl.innerHTML = "";
+    (rubric.strengths || ["Correct approach overall"]).forEach((s) => {
+      const li = document.createElement("li");
+      li.textContent = s;
+      strengthsEl.appendChild(li);
+    });
+
+    // Render Weaknesses
+    const weaknessesEl = document.getElementById("reportWeaknessesList");
+    weaknessesEl.innerHTML = "";
+    (rubric.weaknesses_and_bugs || ["No critical syntax or boundary bugs detected."]).forEach((w) => {
+      const li = document.createElement("li");
+      li.textContent = w;
+      weaknessesEl.appendChild(li);
+    });
+
+    // ── Setup Re-Review Appeal Listeners (1-Appeal Barrier) ──
+    const reReviewBox = document.getElementById("reReviewFormBox");
+    const toggleBtn = document.getElementById("toggleReReviewBtn");
+    const submitReReviewBtn = document.getElementById("submitReReviewBtn");
+
+    const isAppealed = (rubric && rubric.appealCount >= 1) ||
+      String(sub.rubric?.verdict || "").includes("[Re-Review Upheld]") ||
+      String(rubric.appealReason || "").length > 0;
+
+    if (isAppealed) {
+      toggleBtn.disabled = true;
+      toggleBtn.textContent = "Re-Evaluation Utilized (1/1)";
+      toggleBtn.style.opacity = "0.5";
+      toggleBtn.style.cursor = "not-allowed";
+      reReviewBox?.setAttribute("hidden", "");
+    } else if (sub.status === "Re-Review Requested") {
+      toggleBtn.disabled = true;
+      toggleBtn.textContent = "Re-Evaluation Pending Faculty Review";
+      toggleBtn.style.opacity = "0.7";
+      toggleBtn.style.cursor = "not-allowed";
+      reReviewBox?.setAttribute("hidden", "");
+    } else {
+      toggleBtn.disabled = false;
+      toggleBtn.textContent = "Request Faculty Re-Evaluation";
+      toggleBtn.style.opacity = "1";
+      toggleBtn.style.cursor = "pointer";
+      toggleBtn.onclick = () => reReviewBox?.removeAttribute("hidden");
+    }
+
+    document.getElementById("cancelReReviewBtn").onclick = () => reReviewBox?.setAttribute("hidden", "");
+
+    submitReReviewBtn.onclick = async () => {
+      const reason = document.getElementById("reReviewReasonInput").value.trim();
+      if (!reason) {
+        alert("Please provide a reason for re-evaluation.");
+        return;
+      }
+      submitReReviewBtn.disabled = true;
+      submitReReviewBtn.textContent = "Submitting...";
+
+      try {
+        const revRes = await API.requestReEvaluation(trackId, regNo, challengeId, reason);
+        if (revRes && revRes.success) {
+          alert("Re-evaluation appeal sent to your faculty mentor.");
+          modal.setAttribute("hidden", "");
+          window.location.reload();
+        } else {
+          alert("Error: " + (revRes?.error || "Could not submit request."));
+        }
+      } catch (err) {
+        alert("Error submitting request: " + err.message);
+      } finally {
+        submitReReviewBtn.disabled = false;
+        submitReReviewBtn.textContent = "Submit Appeal";
       }
     };
-    reader.onerror = () => {
-      toast("Error reading the code file.");
-    };
 
-    reader.readAsText(file);
-  });
+    modal.removeAttribute("hidden");
+  } catch (err) {
+    alert("Failed to load report: " + err.message);
+  }
+}
 
+// Close Button & Backdrop Dismissal
+document.getElementById("closeReportModalBtn")?.addEventListener("click", () => {
+  document.getElementById("studentReportModal")?.setAttribute("hidden", "");
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    document.getElementById("studentReportModal")?.setAttribute("hidden", "");
+  }
+});
 
 document.addEventListener("DOMContentLoaded", boot);

@@ -12,6 +12,7 @@
 </head>
 <body data-page="faculty-workspace" data-role="faculty">
 
+  <!-- ============================= Topbar Header ============================= -->
   <header class="app-header">
     <div class="brand">
       <img src="../assets/srmaplogo.png" alt="SRM University-AP" class="brand-seal" />
@@ -51,6 +52,7 @@
     </div>
   </header>
 
+  <!-- ============================= Main Shell ============================= -->
   <main class="workspace-shell">
     <!-- Faculty Banner -->
     <section class="faculty-banner">
@@ -71,13 +73,21 @@
             <div class="track-dropdown__menu" id="wsTrackDropdownMenu" role="listbox"></div>
           </div>
         </div>
+        <button class="btn btn-outline" id="openGradebookBtn" type="button" style="display:inline-flex; align-items:center; gap:6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open Gradebook Sheet
+        </button>
         <button class="btn btn-forest" id="openTrackModalBtn" type="button">+ Create Challenge Track</button>
+        <button class="btn btn-outline" id="exportGradebookBtn" type="button" style="display:inline-flex; align-items:center; gap:6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
       </div>
     </section>
 
     <!-- Faculty Workspace Grid -->
     <div class="faculty-layout">
-      <!-- Left Column: Tasks Navigation -->
+      <!-- Left Column: Tasks Navigation & Appeals -->
       <aside class="faculty-left">
         <div class="card">
           <div class="card-header">
@@ -135,96 +145,270 @@
         </div>
       </section>
     </div>
+
+    <!-- ============================= BOTTOM: INSTRUCTIONS THEN FEEDBACK ============================= -->
+    <div class="faculty-bottom-section">
+      <!-- Faculty Operational Guidelines Card -->
+      <section class="card faculty-guide-card">
+        <div class="card-header">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.15rem;">📘</span>
+            <h3 style="margin:0;">Faculty Guidelines &amp; Operational Instructions</h3>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="guide-grid">
+            <div class="guide-item">
+              <div class="guide-item-title">1. Evaluate After Lab Slot Closes</div>
+              <p>Trigger automated evaluation only after student submission deadlines end. Avoid clicking the evaluate button multiple times while a batch is already running.</p>
+            </div>
+            <div class="guide-item">
+              <div class="guide-item-title">2. Do Not Alter Gradebook Headers</div>
+              <p>Please do not edit, rename, or delete the initial columns (Registration Number, Student Name, Task Scores) in your linked Google Sheet. Custom attendance or extra notes can be added in new columns to the far right.</p>
+            </div>
+            <div class="guide-item">
+              <div class="guide-item-title">3. One Lab Track at a Time</div>
+              <p>To keep grading smooth and accurate, evaluate one track section at a time. If a section has more than 60–70 students, grade them in smaller groups.</p>
+            </div>
+            <div class="guide-item">
+              <div class="guide-item-title">4. Direct Access to Student Code</div>
+              <p>Every student submission is preserved in your Google Drive folder. You can inspect any student's original code anytime via the "View Code" links in your gradebook.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Faculty Feedback Banner (Right below guidelines) -->
+      <div class="feedback-banner feedback-banner--faculty">
+        <div class="feedback-banner__copy">
+          <span class="feedback-banner__icon">🛠️</span>
+          <span>Notice any grading inconsistencies, incorrect rubrics, or platform glitches? Send feedback to the administrator.</span>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm feedback-trigger-btn" id="openFacultyFeedbackBtn">
+          Send Mentor Feedback
+        </button>
+      </div>
+    </div>
   </main>
 
-  <!-- Create Task Modal -->
-  <div class="modal-overlay" id="taskModal" hidden>
-    <div class="modal-dialog">
+  <!-- ============================= MODAL: FACULTY ISSUE & ANOMALY REPORT ============================= -->
+  <div class="modal-backdrop" id="facultyFeedbackModal" hidden>
+    <div class="modal-card modal-card--sm">
       <div class="modal-header">
-        <h3>Create New Challenge Task</h3>
-        <button class="btn btn-outline btn-sm close-modal" type="button" aria-label="Close modal">✕</button>
+        <div>
+          <h3 class="modal-title">Mentor Feedback &amp; Portal Issues</h3>
+          <p class="text-xs text-muted">Direct notification to portal admin</p>
+        </div>
+        <button class="btn-close" id="closeFacultyFeedbackModalBtn" type="button">✕</button>
       </div>
+
       <div class="modal-body">
         <div class="form-group">
-          <label for="newTaskTitle">Task Title</label>
-          <input type="text" id="newTaskTitle" class="form-input" placeholder="e.g. Invert a Binary Tree" />
+          <label class="form-label" for="facultyProblemTitleInput">Problem Title</label>
+          <input type="text" id="facultyProblemTitleInput" class="form-input" placeholder="e.g. AI evaluated empty code as pass" required />
         </div>
+
         <div class="form-group">
-          <label for="newTaskStatement">Problem Statement</label>
-          <textarea id="newTaskStatement" class="form-input" rows="4" placeholder="Detail specifications, stdin format, and stdout expectations..."></textarea>
+          <label class="form-label" for="facultyProblemTypeInput">Type of Problem</label>
+          <input type="text" id="facultyProblemTypeInput" class="form-input" placeholder="e.g. Grading Inconsistency / Roster Sync / Drive Permissions" required />
         </div>
-        <div class="modal-field-row">
-          <div class="form-group">
-            <label for="newTaskPoints">Max Points</label>
-            <input type="number" id="newTaskPoints" class="form-input" value="10" />
-          </div>
-          <div class="form-group">
-            <label for="newTaskDeadline">Deadline</label>
-            <input type="datetime-local" id="newTaskDeadline" class="form-input" />
+
+        <div class="form-group">
+          <label class="form-label" for="facultyProblemDescArea">Description</label>
+          <textarea id="facultyProblemDescArea" class="form-textarea" rows="4" placeholder="Detail the issue, affected student IDs, or reproduction steps..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Attach Screenshot (Optional)</label>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label class="btn btn-outline btn-sm file-upload-btn" for="facultyFeedbackImgInput">
+              📷 Select Image (.png, .jpg)
+            </label>
+            <input type="file" id="facultyFeedbackImgInput" accept="image/*" class="hidden-file-input" />
+            <span id="facultyFeedbackImgFileName" class="text-xs text-muted">No screenshot selected</span>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline close-modal" type="button">Cancel</button>
-        <button class="btn btn-primary" id="saveTaskBtn" type="button">Publish Task</button>
+
+        <div class="modal-footer-actions">
+          <button type="button" class="btn btn-ghost btn-sm" id="cancelFacultyFeedbackModalBtn">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="submitFacultyFeedbackBtn">Submit Report</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Create Track Modal -->
-  <div class="modal-overlay" id="trackModal" hidden>
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3>Create Challenge Track</h3>
-        <button class="btn btn-outline btn-sm close-modal" type="button" aria-label="Close modal">✕</button>
+  <!-- ============================= MODAL: CREATE TRACK ============================= -->
+  <div class="modal-overlay" id="createTrackModal" hidden>
+    <div class="onboarding-card">
+      <div class="onboarding-head">
+        <h2>Create Challenge Track</h2>
+        <p>Design a section-wise cohort track and define challenge duration.</p>
       </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="newTrackId">Track ID (Slug)</label>
-          <input type="text" id="newTrackId" class="form-input" placeholder="e.g. c2t-y2-aimlf" />
-        </div>
-        <div class="form-group">
+      <form class="onboarding-form" id="createTrackForm">
+        <div class="field">
           <label for="newTrackName">Track Name</label>
-          <input type="text" id="newTrackName" class="form-input" placeholder="e.g. Code2Think Advanced" />
+          <input type="text" id="newTrackName" placeholder="e.g. Code2Think" required />
         </div>
-        <div class="modal-field-row">
-          <div class="form-group">
-            <label for="newTrackYear">Academic Year</label>
-            <input type="text" id="newTrackYear" class="form-input" placeholder="e.g. 2nd Year" />
+
+        <div class="field-row">
+          <div class="field">
+            <label for="newTrackYear">Target Academic Year</label>
+            <select id="newTrackYear" required>
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year">3rd Year</option>
+              <option value="4th Year">4th Year</option>
+            </select>
           </div>
-          <div class="form-group">
+          <div class="field">
             <label for="newTrackSection">Section</label>
-            <input type="text" id="newTrackSection" class="form-input" placeholder="e.g. AIML-F" />
+            <input type="text" id="newTrackSection" placeholder="e.g. AIML-F" required />
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline close-modal" type="button">Cancel</button>
-        <button class="btn btn-forest" id="saveTrackBtn" type="button">Create Track</button>
-      </div>
+
+        <div class="field">
+          <label for="newTrackDays">Challenge Duration (Total Days)</label>
+          <input type="number" id="newTrackDays" placeholder="e.g. 14" min="1" max="90" value="14" required />
+          <p class="field-hint">Defines how many days the cohort challenges will run for.</p>
+        </div>
+
+        <div class="field">
+          <label for="newTrackDesc">Track Description</label>
+          <textarea id="newTrackDesc" rows="2" placeholder="e.g. Foundational C programming for first-year engineers..."></textarea>
+        </div>
+
+        <div class="mini-dialog-actions">
+          <button type="button" class="btn btn-outline btn-sm" id="closeCreateTrackBtn">Cancel</button>
+          <button type="submit" class="btn btn-forest btn-sm">Create Track</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Inspect Code & Grade Modal -->
+  <!-- ============================= MODAL: CREATE/EDIT TASK ============================= -->
+  <div class="modal-overlay" id="createTaskModal" hidden>
+    <div class="onboarding-card" style="max-width: 640px;">
+      <div class="onboarding-head">
+        <h2>Add New Task / Challenge</h2>
+        <p>Configure a lab scenario with explicit numbering and sample test cases.</p>
+      </div>
+      <form class="onboarding-form" id="createTaskForm">
+        <div class="field-row">
+          <div class="field" style="max-width: 140px;">
+            <label for="newTaskNumber">Task Number</label>
+            <input type="number" id="newTaskNumber" placeholder="1" min="1" max="99" required />
+          </div>
+          <div class="field">
+            <label for="newTaskTitle">Task Name / Title</label>
+            <input type="text" id="newTaskTitle" placeholder="e.g. Smart Library Fine Calculator" required />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="newTaskPoints">Raw Points (Max Marks)</label>
+            <input type="number" id="newTaskPoints" value="10" min="1" max="100" required />
+          </div>
+          <div class="field">
+            <label for="newTaskDeadline">Submission Deadline</label>
+            <input type="datetime-local" id="newTaskDeadline" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="newTaskStatement">Problem Statement &amp; Guidelines</label>
+          <textarea id="newTaskStatement" rows="4" placeholder="Describe the real-world scenario, progressive slab rates, and re-entry requirements..." required></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="newTaskInput">Sample Input</label>
+            <textarea id="newTaskInput" rows="3" placeholder="5&#10;10 20 30 40 50" required></textarea>
+          </div>
+          <div class="field">
+            <label for="newTaskOutput">Expected Output</label>
+            <textarea id="newTaskOutput" rows="3" placeholder="Found: 30" required></textarea>
+          </div>
+        </div>
+
+        <input type="hidden" id="editChallengeId" value="" />
+
+        <div class="mini-dialog-actions" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <button type="button" class="btn btn-danger-outline btn-sm" id="deleteTaskBtn" style="display:none;">Delete Task</button>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-outline btn-sm" id="closeCreateTaskBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm" id="saveTaskSubmitBtn">Publish Task</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================= MODAL: FACULTY EVALUATION STUDIO ============================= -->
   <div class="modal-overlay" id="inspectModal" hidden>
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3 id="inspectTitle">Evaluate Submission</h3>
-        <button class="btn btn-outline btn-sm close-modal" type="button" aria-label="Close modal">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Submitted Source Code</label>
-          <pre class="code-preview-box font-mono" id="inspectCodePreview">// Code will appear here...</pre>
+    <div class="onboarding-card" style="max-width: 680px; text-align: left; max-height: 90vh; overflow-y: auto;">
+      <div class="onboarding-head" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h2 id="inspectTitle">Evaluate Submission</h2>
+          <p id="inspectMeta" style="color: var(--text-muted); font-size: 0.85rem;">Official Academic Assessment &amp; Marks Adjustment</p>
         </div>
-        <div class="form-group">
-          <label for="overridePointsInput">Override / Award Points (0 - 10)</label>
-          <input type="number" id="overridePointsInput" class="form-input font-mono" min="0" max="10" step="0.5" />
-        </div>
+        <button class="btn btn-outline btn-xs close-modal" type="button">✕</button>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline close-modal" type="button">Cancel</button>
-        <button class="btn btn-primary" id="saveOverrideGradeBtn" type="button">Confirm &amp; Award Marks</button>
+
+      <div class="modal-body-form" style="margin-top: 14px; display: flex; flex-direction: column; gap: 14px;">
+        <div id="inspectAppealAlert" style="display:none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 12px;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: #f59e0b; text-transform: uppercase; margin-bottom: 4px;">Student Appeal Reason</div>
+          <div id="inspectAppealReason" style="font-size: 0.84rem; line-height: 1.4;">—</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border);">
+          <span style="font-size: 0.82rem; color: var(--text-muted);">Source Code Artifact:</span>
+          <a id="inspectCodeLink" href="#" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;">🔗 View Code in Google Drive</a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px; border-radius: 8px; border: 1px solid var(--border);">
+          <div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Awarded Score (0 - 10)</div>
+            <input type="number" id="inspectScoreInput" min="0" max="10" step="0.5" style="width: 100%; font-size: 1.25rem; font-weight: 700; font-family: var(--font-mono); margin-top: 4px; padding: 6px 10px; border-radius: 6px;" />
+          </div>
+          <div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Converted Lab Mark (/ 5.00)</div>
+            <div id="inspectConvertedPreview" style="font-size: 1.25rem; font-weight: 700; color: #10b981; font-family: var(--font-mono); margin-top: 8px;">— / 5.00</div>
+          </div>
+        </div>
+
+        <div>
+          <label for="inspectVerdictInput" style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 4px;">Faculty Review Summary (Verdict)</label>
+          <textarea id="inspectVerdictInput" rows="2" style="width: 100%; border-radius: 6px; padding: 8px; font-size: 0.82rem;" placeholder="e.g. Logic validated. All boundary conditions pass."></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label for="inspectStrengthsInput" style="font-size: 0.78rem; font-weight: 600; color: #10b981; display: block; margin-bottom: 4px;">Implementation Strengths (1 per line)</label>
+            <textarea id="inspectStrengthsInput" rows="3" style="width: 100%; border-radius: 6px; padding: 8px; font-size: 0.8rem;" placeholder="Clean modular structure&#10;Handles negative inputs"></textarea>
+          </div>
+          <div>
+            <label for="inspectWeaknessesInput" style="font-size: 0.78rem; font-weight: 600; color: #ef4444; display: block; margin-bottom: 4px;">Refactoring Areas &amp; Boundary Flaws (1 per line)</label>
+            <textarea id="inspectWeaknessesInput" rows="3" style="width: 100%; border-radius: 6px; padding: 8px; font-size: 0.8rem;" placeholder="Redundant conditional branch&#10;Check edge case at 0"></textarea>
+          </div>
+        </div>
+
+        <div>
+          <label for="inspectGuidanceInput" style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 4px;">Pedagogical Guidance</label>
+          <textarea id="inspectGuidanceInput" rows="2" style="width: 100%; border-radius: 6px; padding: 8px; font-size: 0.82rem;" placeholder="e.g. Try rewriting using ternary operators or switch statements for clarity."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 12px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <button type="button" class="btn btn-danger-outline btn-sm" id="rejectAppealBtn" style="display: none;">✕ Reject Appeal (Keep Marks)</button>
+          </div>
+          <div style="display: flex; gap: 10px; margin-left: auto;">
+            <button type="button" class="btn btn-outline close-modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="saveInspectEvaluationBtn">Confirm &amp; Award Marks</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

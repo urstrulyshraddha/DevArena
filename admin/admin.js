@@ -12,6 +12,16 @@ function toast(msg) {
   setTimeout(() => el.classList.remove("visible"), 2500);
 }
 
+function escapeHtml(str) {
+  return String(str || "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c]));
+}
+
 function trackLabel(t) {
   return t.section ? `${t.name} · ${t.section} (${t.year})` : `${t.name} (${t.year})`;
 }
@@ -68,27 +78,45 @@ async function renderAll() {
 
     tr.innerHTML = `
       <td>
-        <div class="faculty-name">${f.name}</div>
-        <div class="faculty-sub">${f.title || "Faculty Member"}</div>
+        <div class="faculty-name">${escapeHtml(f.name)}</div>
+        <div class="faculty-sub">${escapeHtml(f.title || "Faculty Member")}</div>
       </td>
-      <td style="font-family:var(--font-mono); color:#a1a1aa;">${f.email}</td>
+      <td style="font-family:var(--font-mono); color:#a1a1aa;">${escapeHtml(f.email)}</td>
       <td>${statusBadge}</td>
       <td>${tracksDropdownHtml}</td>
       <td style="text-align:right;">
         ${f.role === "admin"
           ? '<span style="color:#52525b; font-size:0.75rem;">Protected</span>'
-          : `<button type="button" class="btn-danger-outline delete-btn" data-id="${f.id}">Revoke</button>`
+          : `<button type="button" class="btn-danger-outline delete-btn" data-id="${f.id || f.facultyId}">Revoke</button>`
         }
       </td>
     `;
 
     const deleteBtn = tr.querySelector(".delete-btn");
     if (deleteBtn) {
-      deleteBtn.addEventListener("click", () => {
-        if (confirm(`Revoke access for ${f.name}? (Production rows are safely maintained in Sheets).`)) {
-          portalData.faculties = portalData.faculties.filter((item) => item.id !== f.id);
-          renderAll();
-          toast(`Removed ${f.name} from current view`);
+      deleteBtn.addEventListener("click", async () => {
+        if (!confirm(`Revoke access for ${f.name}?\nThis will permanently remove their records from Faculties_Catalog, Tracks_Catalog, and Users_Auth.`)) {
+          return;
+        }
+
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = "Revoking...";
+
+        try {
+          const facultyId = f.id || f.facultyId || "";
+          const res = await API.revokeFaculty(facultyId, f.email);
+          if (res && res.success) {
+            toast(`Revoked ${f.name} and erased from Sheets.`);
+            await boot();
+          } else {
+            alert("Failed to revoke: " + (res?.error || "Unknown server error"));
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = "Revoke";
+          }
+        } catch (err) {
+          alert("Error deleting faculty: " + err.message);
+          deleteBtn.disabled = false;
+          deleteBtn.textContent = "Revoke";
         }
       });
     }
@@ -246,7 +274,98 @@ async function boot() {
     toast("Backend unreachable.");
   }
   await renderAll();
+  await loadFeedbackTickets();
 }
+
+async function loadFeedbackTickets() {
+  const tbody = document.getElementById("feedbackTableBody");
+  if (!tbody) return;
+
+  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:24px; color:#71717a;">Loading tickets...</td></tr>`;
+
+  try {
+    const res = await API.getFeedbackReports("admin");
+    if (!res || !res.success || !res.reports || res.reports.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:#71717a;">No feedback reports recorded yet.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = "";
+    res.reports.forEach((item) => {
+      const tr = document.createElement("tr");
+
+      // Normalize status
+      const rawStatus = String(item.status || "OPEN").trim().toUpperCase();
+      const isResolved = rawStatus === "RESOLVED";
+      const statusText = (rawStatus === "NONE" || !rawStatus) ? "OPEN" : rawStatus;
+
+      const isFaculty = String(item.role).toUpperCase() === "FACULTY";
+
+      // Screenshot link formatting
+      const screenshotLink = (item.screenshotUrl && item.screenshotUrl !== "None" && String(item.screenshotUrl).startsWith("http"))
+        ? `<div style="margin-top:8px;">
+             <a href="${escapeHtml(item.screenshotUrl)}" target="_blank" class="feedback-img-pill">
+               📷 View Attached Screenshot ↗
+             </a>
+           </div>`
+        : "";
+
+      tr.innerHTML = `
+        <td>
+          <span class="ticket-id-tag font-mono">${escapeHtml(item.ticketId)}</span>
+        </td>
+        <td>
+          <span class="role-badge ${isFaculty ? 'role-faculty' : 'role-student'}">
+            ${escapeHtml(item.role)}
+          </span>
+        </td>
+        <td>
+          <div style="font-weight:600; color:#f4f4f5; font-size:0.85rem;">${escapeHtml(item.userId)}</div>
+        </td>
+        <td>
+          <div style="font-family:var(--font-mono); font-size:0.8rem; color:#e4e4e7;">${escapeHtml(item.trackId)}</div>
+          <div style="font-family:var(--font-mono); font-size:0.72rem; color:#a1a1aa; margin-top:2px;">Task: <span style="color:#38bdf8;">${escapeHtml(item.challengeId)}</span></div>
+        </td>
+        <td style="vertical-align:top;">
+          <div class="feedback-card-inline">
+            <div class="feedback-title">${escapeHtml(item.subject || item.problemTitle || 'User Report')}</div>
+            <div class="feedback-type">Type: <span>${escapeHtml(item.category || item.problemType || 'General')}</span></div>
+            <div class="feedback-desc">${escapeHtml(item.message || item.description || '')}</div>
+            ${screenshotLink}
+          </div>
+        </td>
+        <td style="text-align:center;">
+          <span class="status-badge ${isResolved ? 'resolved' : 'open'}">
+            ${escapeHtml(statusText)}
+          </span>
+        </td>
+        <td style="text-align:right;">
+          ${!isResolved ? `
+            <button class="btn-small-outline resolve-ticket-btn" data-id="${escapeHtml(item.ticketId)}" type="button">Mark Resolved</button>
+          ` : `<span style="font-size:0.75rem; color:#71717a; font-weight:500;">Resolved ✓</span>`}
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+
+    // Wire buttons
+    document.querySelectorAll(".resolve-ticket-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        btn.disabled = true;
+        btn.textContent = "Saving...";
+        await API.updateFeedbackStatus("admin", id, "RESOLVED");
+        await loadFeedbackTickets();
+      });
+    });
+
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444; padding:24px;">Failed to load reports: ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+document.getElementById("refreshFeedbackBtn")?.addEventListener("click", loadFeedbackTickets);
 
 document.getElementById("purgeCacheBtn")?.addEventListener("click", () => {
   if (confirm("Purge browser session and reload console?")) {

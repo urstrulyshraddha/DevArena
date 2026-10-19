@@ -4,7 +4,7 @@
    ========================================================================== */
 
 .leaderboard-layout {
-  max-width: 1360px;
+  max-width: 1380px;
   width: 100%;
   margin: 0 auto;
   padding: 24px 28px 60px;
@@ -18,6 +18,8 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
   margin-bottom: 2px;
 }
 
@@ -36,7 +38,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   TOP TWO-COLUMN OVERVIEW GRID (Standing + Graph Corner)
+   TOP TWO-COLUMN OVERVIEW GRID (Standing + Trajectory Curve)
    -------------------------------------------------------------------------- */
 .overview-grid {
   display: grid;
@@ -45,7 +47,7 @@
   align-items: stretch;
 }
 
-/* ── Left: Personal Standing Card (High Contrast for Both Themes) ── */
+/* ── Left: Personal Standing Card ── */
 .student-standing-card {
   display: flex;
   flex-direction: column;
@@ -57,7 +59,7 @@
   transition: background var(--transition-base), border-color var(--transition-base);
 }
 
-/* Light Theme: Deep Royal Navy Card with Crisp White & Ice Blue Text */
+/* Light Theme: Royal Navy Card */
 :root:not([data-theme="dark"]) .student-standing-card {
   background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
   border: 1px solid rgba(15, 23, 42, 0.2);
@@ -87,7 +89,7 @@
   font-weight: 600;
 }
 
-/* Dark Theme: Subtle Charcoal/Navy with Slate Accents */
+/* Dark Theme: Midnight Slate with Blue Accents */
 :root[data-theme="dark"] .student-standing-card {
   background: linear-gradient(135deg, rgba(30, 58, 95, 0.45) 0%, rgba(15, 23, 42, 0.95) 100%);
   border: 1px solid var(--border);
@@ -170,6 +172,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .curve-card__header h3 {
@@ -181,10 +185,6 @@
 
 .curve-card__header span {
   font-weight: 600;
-}
-
-:root:not([data-theme="dark"]) .curve-card__header span {
-  color: var(--text);
 }
 
 .curve-svg-container {
@@ -226,7 +226,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   REDUCED COMPACT STANDINGS TABLE
+   STANDINGS TABLE
    -------------------------------------------------------------------------- */
 .standings-card {
   width: 100%;
@@ -244,6 +244,8 @@
   padding: 14px 20px;
   border-bottom: 1px solid var(--border);
   background: var(--surface-alt);
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .standings-card__header h2 {
@@ -252,23 +254,16 @@
   color: var(--text);
 }
 
-.standings-card__header span {
-  font-weight: 600;
-}
-
-:root:not([data-theme="dark"]) .standings-card__header span {
-  color: var(--text-muted);
-}
-
 .table-responsive {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .student-rank-table {
   width: 100% !important;
+  min-width: 720px;
   border-collapse: collapse;
-  table-layout: fixed;
   font-size: 0.86rem;
 }
 
@@ -295,7 +290,7 @@
   background: var(--surface-sunken);
 }
 
-/* ── Current user row highlight (Clear in both modes) ── */
+/* Current user row highlight */
 :root:not([data-theme="dark"]) .student-rank-table tr.is-current-user td {
   background: #eff6ff !important;
   border-bottom-color: #bfdbfe;
@@ -316,38 +311,20 @@
 
 /* Explicit Proportions */
 .student-rank-table th:nth-child(1),
-.student-rank-table td:nth-child(1) {
-  width: 10%;
-  text-align: center;
-}
+.student-rank-table td:nth-child(1) { width: 10%; text-align: center; }
 
 .student-rank-table th:nth-child(2),
-.student-rank-table td:nth-child(2) {
-  width: 32%;
-  text-align: left;
-}
+.student-rank-table td:nth-child(2) { width: 32%; text-align: left; }
 
 .student-rank-table th:nth-child(3),
-.student-rank-table td:nth-child(3) {
-  width: 24%;
-  text-align: left;
-}
+.student-rank-table td:nth-child(3) { width: 24%; text-align: left; }
 
 .student-rank-table th:nth-child(4),
-.student-rank-table td:nth-child(4) {
-  width: 17%;
-  text-align: right;
-  padding-right: 24px;
-}
+.student-rank-table td:nth-child(4) { width: 17%; text-align: right; padding-right: 20px; }
 
 .student-rank-table th:nth-child(5),
-.student-rank-table td:nth-child(5) {
-  width: 17%;
-  text-align: right;
-  padding-right: 24px;
-}
+.student-rank-table td:nth-child(5) { width: 17%; text-align: right; padding-right: 20px; }
 
-/* Typography in table */
 .student-regno {
   font-family: var(--font-mono, monospace);
   font-weight: 700;
@@ -361,40 +338,23 @@
   margin-top: 1px;
 }
 
-/* ── High-Contrast Track Badge ── */
 .track-badge {
   display: inline-block;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 6px;
   font-size: 0.78rem;
   font-family: var(--font-mono, monospace);
   font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-/* Light Theme: Subtle grey background with crisp slate text */
-:root:not([data-theme="dark"]) .track-badge {
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  color: #334155;
-}
-
-/* Dark Theme: Muted dark background with light slate text */
-:root[data-theme="dark"] .track-badge {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-sunken);
   border: 1px solid var(--border);
-  color: #e2e8f0;
+  color: var(--text);
 }
 
-/* ── Points & Converted Marks Typography ── */
 .raw-points-val {
   font-family: var(--font-mono, monospace);
   font-weight: 700;
   font-size: 0.96rem;
-}
-
-:root:not([data-theme="dark"]) .raw-points-val {
-  color: #0284c7;
+  color: #2563eb;
 }
 
 :root[data-theme="dark"] .raw-points-val {
@@ -424,7 +384,7 @@
 .medal-bronze { background: rgba(217, 119, 6, 0.2); color: #9a3412; border: 1px solid #d97706; }
 
 /* --------------------------------------------------------------------------
-   RESPONSIVE
+   RESPONSIVE DESIGN BREAKPOINTS
    -------------------------------------------------------------------------- */
 @media (max-width: 900px) {
   .overview-grid {
@@ -432,11 +392,21 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .leaderboard-layout {
-    padding: 14px 14px 40px;
+    padding: 16px 14px 40px;
   }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
   .student-standing-stats {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .student-standing-card {
+    padding: 18px 20px;
   }
 }

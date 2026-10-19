@@ -146,6 +146,38 @@
       </div>
     </section>
 
+
+    <!-- 3. USER FEEDBACK & ANOMALY REPORTS PANEL -->
+        <section class="panel" style="margin-top: 28px;">
+          <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h2 class="panel-title">User Feedback &amp; Anomaly Reports</h2>
+              <span class="panel-sub">Live student &amp; faculty bug reports, false positives, and suggestions</span>
+            </div>
+            <button class="btn-small-outline" id="refreshFeedbackBtn" type="button" style="display:inline-flex; align-items:center; gap:6px;">
+              ↻ Refresh Tickets
+            </button>
+          </div>
+
+          <div class="table-responsive-wrapper">
+            <table class="faculty-table feedback-admin-table">
+              <thead>
+                <tr>
+                  <th style="width: 13%;">Ticket ID</th>
+                  <th style="width: 8%;">Role</th>
+                  <th style="width: 14%;">User Identifier</th>
+                  <th style="width: 14%;">Track &amp; Task</th>
+                  <th style="width: 33%;">Problem Details</th>
+                  <th style="width: 8%; text-align:center;">Status</th>
+                  <th style="width: 10%; text-align:right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="feedbackTableBody">
+                <tr><td colspan="7" class="text-center" style="padding:24px; color:#71717a;">Loading feedback tickets...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
   </main>
 
   <div class="admin-toast" id="adminToast"></div>

@@ -116,6 +116,7 @@ export function initOnboarding(portalConfig, onProceed) {
   const emailInput = document.getElementById("emailInput");
   const yearSelect = document.getElementById("yearSelect");
   const mentorSelect = document.getElementById("mentorSelect");
+  const trackSelect = document.getElementById("studentTrack");
   const routePreviewText = document.getElementById("routePreviewText");
 
   // Faculty / Admin inputs
@@ -176,7 +177,7 @@ export function initOnboarding(portalConfig, onProceed) {
       opt.textContent = yr;
       yearSelect.appendChild(opt);
     });
-    yearSelect.addEventListener("change", updateRoutePreview);
+    yearSelect.addEventListener("change", syncTracksAndPreview);
   }
 
   /* ── 4. Populate Mentors (Teaching Faculty Only) ── */
@@ -190,27 +191,90 @@ export function initOnboarding(portalConfig, onProceed) {
       opt.textContent = `${fac.name} (${fac.title || 'Faculty'})`;
       mentorSelect.appendChild(opt);
     });
-    mentorSelect.addEventListener("change", updateRoutePreview);
+    mentorSelect.addEventListener("change", syncTracksAndPreview);
+  }
+
+  /* ── Dynamic Section/Track Synchronizer ── */
+  function syncTracksAndPreview() {
+    if (!trackSelect) return;
+
+    const facId = (mentorSelect?.value || "").trim().toLowerCase();
+    const yr = (yearSelect?.value || "").trim();
+
+    trackSelect.innerHTML = "";
+
+    if (!facId || !yr) {
+      trackSelect.innerHTML = `<option value="" disabled selected>Select Academic Year &amp; Mentor First</option>`;
+      if (routePreviewText) routePreviewText.textContent = "";
+      return;
+    }
+
+    const faculty = faculties.find(f =>
+      String(f.id).trim().toLowerCase() === facId ||
+      String(f.email).trim().toLowerCase() === facId
+    );
+
+    const facultyTracks = faculty?.tracks || [];
+    const yrNum = yr.replace(/[^0-9]/g, "");
+
+    // Filter tracks belonging to the selected academic year
+    const availableTracks = facultyTracks.filter(t => {
+      const tYrNum = String(t.year || "").replace(/[^0-9]/g, "");
+      return tYrNum === yrNum || String(t.year || "").toLowerCase() === yr.toLowerCase();
+    });
+
+    if (availableTracks.length === 0) {
+      trackSelect.innerHTML = `<option value="" disabled selected>No active cohorts for ${yr}</option>`;
+      if (routePreviewText) {
+        routePreviewText.textContent = `⚠️ No active sections registered for ${faculty?.name || 'mentor'} in ${yr}.`;
+      }
+      return;
+    }
+
+    trackSelect.innerHTML = `<option value="" disabled selected>Select your section / track</option>`;
+    availableTracks.forEach(t => {
+      const opt = document.createElement("option");
+      // Guarantee opt.value has the exact sheet tab trackId (e.g. c2t-y1-aimlf)
+      opt.value = t.id || `${t.name.toLowerCase().replace(/[^a-z0-9]/g, '')}-y${yrNum}-${(t.section || 'A').toLowerCase().replace(/[^a-z0-9]/g, '')}`;
+      opt.dataset.id = opt.value;
+      opt.dataset.name = t.name;
+      opt.dataset.section = t.section || "";
+      opt.dataset.year = t.year || yr;
+      opt.textContent = `${t.name} · ${t.section || t.year || "Cohort"}`;
+      trackSelect.appendChild(opt);
+    });
+
+    // Auto-select if only one track exists for this faculty and year
+    if (availableTracks.length === 1) {
+      trackSelect.value = trackSelect.options[1].value;
+    }
+
+    updateRoutePreview();
   }
 
   function updateRoutePreview() {
     if (!routePreviewText) return;
+
     const facId = mentorSelect?.value;
     const yr = yearSelect?.value;
+    const selectedTrackOpt = trackSelect?.selectedOptions[0];
+
     if (!facId || !yr) {
       routePreviewText.textContent = "";
       return;
     }
-    const faculty = faculties.find(f => f.id === facId);
-    const assignedTrack = faculty && Array.isArray(faculty.tracks)
-      ? (faculty.tracks.find(t => t.year === yr) || faculty.tracks[0])
-      : null;
 
-    if (assignedTrack) {
-      routePreviewText.textContent = `Assigned Cohort: ${assignedTrack.name} (${assignedTrack.section || assignedTrack.year})`;
+    const faculty = faculties.find(f => f.id === facId);
+
+    if (selectedTrackOpt && selectedTrackOpt.value) {
+      routePreviewText.textContent = `Assigned Cohort: ${selectedTrackOpt.textContent}`;
     } else {
-      routePreviewText.textContent = `Assigned Mentor: ${faculty ? faculty.name : facId}`;
+      routePreviewText.textContent = `Assigned Mentor: ${faculty ? faculty.name : facId} (${yr})`;
     }
+  }
+
+  if (trackSelect) {
+    trackSelect.addEventListener("change", updateRoutePreview);
   }
 
   /* ── 5. Populate Account Dropdown (Faculty + Administrator) ── */
@@ -255,13 +319,22 @@ export function initOnboarding(portalConfig, onProceed) {
         const academicYear = yearSelect?.value;
         const mentorId = mentorSelect?.value;
 
+        // Extract the selected track directly from trackSelect
+        const selectedTrackOpt = trackSelect?.selectedOptions[0];
+        const trackId = (trackSelect?.value || selectedTrackOpt?.value || selectedTrackOpt?.dataset?.id || "").trim();
+
         if (!name || !regNo || !email || !academicYear || !mentorId) {
           showBanner("Please fill in all student onboarding fields.");
           return;
         }
 
+        if (!trackId) {
+          showBanner("Please select your enrolled section.");
+          return;
+        }
+
         if (!/^AP\d{11}$/.test(regNo)) {
-          showBanner("Registration number must follow format AP followed by 11 digits (e.g. AP25110090188).");
+          showBanner("Registration number must follow format AP followed by 11 digits (e.g. AP25110010133).");
           return;
         }
 
@@ -271,13 +344,8 @@ export function initOnboarding(portalConfig, onProceed) {
         }
 
         const faculty = faculties.find(f => f.id === mentorId);
-        const assignedTrack = faculty && Array.isArray(faculty.tracks)
-          ? (faculty.tracks.find(t => t.year === academicYear) || faculty.tracks[0])
-          : null;
-
-        const trackId = assignedTrack ? assignedTrack.id : "c2t-y1-aimlf";
-        const trackName = assignedTrack ? assignedTrack.name : "Code2Think";
-        const section = assignedTrack ? assignedTrack.section : "AIML-F";
+        const trackName = selectedTrackOpt?.dataset?.name || "DevArena Track";
+        const section = selectedTrackOpt?.dataset?.section || "";
 
         const submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) {
@@ -291,21 +359,23 @@ export function initOnboarding(portalConfig, onProceed) {
             regNo,
             email,
             academicYear,
-            mentorId
+            mentorId,
+            trackId
           });
 
           if (res && res.success) {
+            const studentInfo = res.student || {};
             const session = {
               role: "student",
               studentId: regNo,
               regNo,
               name,
               email,
-              academicYear,
-              section,
-              mentorId,
+              academicYear: studentInfo.academicYear || academicYear,
+              section: section,
+              mentorId: studentInfo.mentorId || mentorId,
               mentorName: faculty ? faculty.name : "Faculty Mentor",
-              trackId,
+              trackId: studentInfo.trackId || trackId,
               trackName
             };
 

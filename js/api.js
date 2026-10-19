@@ -77,8 +77,19 @@ export const API = {
   // Portal & Catalog
   getPortalConfig: () => get("getPortalConfig"),
 
-  // Authentication
-  studentLogin: (studentData) => post("studentLogin", studentData),
+  // Authentication (Guarantees trackId is explicitly sent to GAS)
+  studentLogin: (studentData) => {
+    const payload = typeof studentData === "object" ? {
+      name: studentData.name,
+      regNo: studentData.regNo,
+      email: studentData.email,
+      academicYear: studentData.academicYear,
+      mentorId: studentData.mentorId,
+      trackId: studentData.trackId || studentData.track || ""
+    } : {};
+    return post("studentLogin", payload);
+  },
+
   facultyAuth: (email, password, role = "faculty") => post("facultyAuth", { email, password, role }),
 
   // Challenges & Tasks
@@ -86,17 +97,28 @@ export const API = {
   createTask: (taskData) => post("createTask", taskData),
   createTrack: (trackData) => post("createTrack", trackData),
   addFacultyCatalog: (payload) => post("addFacultyCatalog", payload),
+  revokeFaculty: (facultyId, email) => post("revokeFaculty", { facultyId, email }),
+  updateTask: (taskData) => post("updateTask", taskData),
+  deleteTask: (challengeId, trackId) => post("deleteTask", { challengeId, trackId }),
+  getFacultyGradebook: (payload) => post("getFacultyGradebook", payload),
+  getStudentSubmissionReport: (trackId, regNo, challengeId) => post("getStudentSubmissionReport", { trackId, regNo, challengeId }),
+  requestReEvaluation: (trackId, regNo, challengeId, reason) => post("requestReEvaluation", { trackId, regNo, challengeId, reason }),
+  exportTrackGradebook: (trackId, facultyId) => post("exportTrackGradebook", { trackId, facultyId }),
 
   // Submissions & AI
   submitChallenge: (submissionData) => post("submitChallenge", submissionData),
   triggerBatchAI: (trackId) => post("triggerBatchAI", { trackId }),
   getSubmissions: (trackId) => get("getSubmissions", { trackId }),
-  facultyGradeOverride: (trackId, regNo, challengeId, rawPoints) =>
-    post("facultyGradeOverride", { trackId, regNo, challengeId, rawPoints }),
+  facultyGradeOverride: (payload) => post("facultyGradeOverride", payload),
 
   // Leaderboard & Analytics
   getLeaderboard: (trackId, email) => get("getLeaderboard", { trackId, email: email || "" }),
   getHistoricalAnalytics: (email) => get("getHistoricalAnalytics", { email }),
+
+
+  submitFeedback: (payload) => post("submitFeedback", payload),
+    getFeedbackReports: (adminRole) => post("getFeedbackReports", { role: adminRole }),
+    updateFeedbackStatus: (adminRole, ticketId, newStatus) => post("updateFeedbackStatus", { role: adminRole, ticketId, newStatus }),
 
   // Helper utility for file uploads
   fileToBase64: (file) => {
