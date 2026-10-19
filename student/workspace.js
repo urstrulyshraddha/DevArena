@@ -238,131 +238,234 @@ async function boot() {
   }
 
   // 7. Render Active Challenge Details
-  function renderActiveChallenge() {
-    if (!activeChallenge) return;
+    function renderActiveChallenge() {
+      if (!activeChallenge) return;
 
-    document.getElementById("activeChallengeTitle").textContent = activeChallenge.title;
-    document.getElementById("activeChallengePoints").textContent = `${activeChallenge.points || 10} Marks`;
-    document.getElementById("statementText").textContent = activeChallenge.statement;
-    document.getElementById("pointsStat").textContent = `${activeChallenge.points || 10} Pts`;
+      const titleEl = document.getElementById("activeChallengeTitle");
+      const ptsEl = document.getElementById("activeChallengePoints");
+      const stmtEl = document.getElementById("statementText");
+      const pointsStatEl = document.getElementById("pointsStat");
 
-    const sub = userSubmissions.find((s) => String(s.challengeId) === String(activeChallenge.id));
-    renderStepper(sub);
-    renderSampleCasesDisplay(activeChallenge.sampleTests || []);
+      if (titleEl) titleEl.textContent = activeChallenge.title;
+      if (ptsEl) ptsEl.textContent = `${activeChallenge.points || 10} Marks`;
+      if (stmtEl) stmtEl.textContent = activeChallenge.statement;
+      if (pointsStatEl) pointsStatEl.textContent = `${activeChallenge.points || 10} Pts`;
 
-    // ── Clean Slate Reset: Keep student fields completely empty for custom runs ──
-    const inputField = document.getElementById("studentTestInput");
-    const outputField = document.getElementById("studentTestOutput");
-    const reflField = document.getElementById("reflectionArea");
-    const codeField = document.getElementById("codeEditor");
+      const sub = userSubmissions.find((s) => String(s.challengeId) === String(activeChallenge.id));
+      renderStepper(sub);
+      renderSampleCasesDisplay(activeChallenge.sampleTests || []);
 
-    if (inputField) inputField.value = "";
-    if (outputField) outputField.value = "";
-    if (reflField) reflField.value = "";
-    if (codeField && !sub) codeField.value = "";
+      // ── Clean Slate Reset: Keep student fields completely empty for custom runs ──
+      const inputField = document.getElementById("studentTestInput");
+      const outputField = document.getElementById("studentTestOutput");
+      const reflField = document.getElementById("reflectionArea");
+      const codeField = document.getElementById("codeEditor");
 
-    // Reset attached PDF chip if switching tasks
-    attachedPdfBase64 = null;
-    attachedPdfName = null;
-    const pdfInput = document.getElementById("pdfFileInput");
-    if (pdfInput) pdfInput.value = "";
-    document.getElementById("reflectionFileChipWrap")?.setAttribute("hidden", "");
+      if (inputField) inputField.value = "";
+      if (outputField) outputField.value = "";
+      if (reflField) reflField.value = "";
+      if (codeField && !sub) codeField.value = "";
 
-    const submitBtn = document.getElementById("submitBtn");
-    let viewReportBtn = document.getElementById("viewReportBtn");
+      // Reset attached PDF chip if switching tasks
+      attachedPdfBase64 = null;
+      attachedPdfName = null;
+      const pdfInput = document.getElementById("pdfFileInput");
+      if (pdfInput) pdfInput.value = "";
+      document.getElementById("reflectionFileChipWrap")?.setAttribute("hidden", "");
 
-    // Dynamic View Report button injection next to submit button
-    if (!viewReportBtn && submitBtn && submitBtn.parentNode) {
-      viewReportBtn = document.createElement("button");
-      viewReportBtn.type = "button";
-      viewReportBtn.id = "viewReportBtn";
-      viewReportBtn.className = "btn btn-outline";
-      viewReportBtn.style.marginRight = "10px";
-      viewReportBtn.textContent = "📋 View Evaluation Report";
-      submitBtn.parentNode.insertBefore(viewReportBtn, submitBtn);
-    }
+      const submitBtn = document.getElementById("submitBtn");
+      let viewReportBtn = document.getElementById("viewReportBtn");
 
-    // ── Strict Deadline Check ──
-    const now = new Date();
-    const deadlineDate = activeChallenge.deadline ? new Date(activeChallenge.deadline) : null;
-    const isExpired = deadlineDate && !isNaN(deadlineDate.getTime()) && now > deadlineDate;
-
-    if (sub && (sub.status === "Evaluated" || sub.status === "Re-Review Requested")) {
-      if (viewReportBtn) {
-        viewReportBtn.style.display = "inline-flex";
-        viewReportBtn.onclick = () => openStudentReportModal(activeChallenge.id);
+      if (!viewReportBtn && submitBtn && submitBtn.parentNode) {
+        viewReportBtn = document.createElement("button");
+        viewReportBtn.type = "button";
+        viewReportBtn.id = "viewReportBtn";
+        viewReportBtn.className = "btn btn-outline";
+        viewReportBtn.style.marginRight = "10px";
+        viewReportBtn.textContent = "📋 View Evaluation Report";
+        submitBtn.parentNode.insertBefore(viewReportBtn, submitBtn);
       }
-      if (submitBtn) {
-        if (isExpired) {
-          submitBtn.disabled = true;
-          submitBtn.textContent = "Deadline Passed";
-          submitBtn.classList.remove("btn-primary");
-          submitBtn.classList.add("btn-outline");
-          submitBtn.title = `Submissions closed on ${deadlineDate.toLocaleString()}`;
-        } else {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Resubmit Solution";
-          submitBtn.classList.add("btn-primary");
-          submitBtn.classList.remove("btn-outline");
-          submitBtn.title = "";
+
+      const now = new Date();
+      const deadlineDate = activeChallenge.deadline ? new Date(activeChallenge.deadline) : null;
+      const isExpired = deadlineDate && !isNaN(deadlineDate.getTime()) && now > deadlineDate;
+
+      if (sub && (sub.status === "Evaluated" || sub.status === "Re-Review Requested")) {
+        if (viewReportBtn) {
+          viewReportBtn.style.display = "inline-flex";
+          viewReportBtn.onclick = () => openStudentReportModal(activeChallenge.id);
+        }
+        if (submitBtn) {
+          if (isExpired) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Deadline Passed";
+            submitBtn.classList.remove("btn-primary");
+            submitBtn.classList.add("btn-outline");
+            submitBtn.title = `Submissions closed on ${deadlineDate.toLocaleString()}`;
+          } else {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Resubmit Solution";
+            submitBtn.classList.add("btn-primary");
+            submitBtn.classList.remove("btn-outline");
+            submitBtn.title = "";
+          }
+        }
+      } else {
+        if (viewReportBtn) viewReportBtn.style.display = "none";
+        if (submitBtn) {
+          if (isExpired) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Deadline Passed";
+            submitBtn.classList.remove("btn-primary");
+            submitBtn.classList.add("btn-outline");
+            submitBtn.title = `Submissions closed on ${deadlineDate.toLocaleString()}`;
+          } else {
+            submitBtn.disabled = false;
+            submitBtn.textContent = sub ? "Resubmit Solution & Reflection" : "Submit Solution & Reflection";
+            submitBtn.classList.add("btn-primary");
+            submitBtn.classList.remove("btn-outline");
+            submitBtn.title = "";
+          }
         }
       }
-    } else {
-      if (viewReportBtn) viewReportBtn.style.display = "none";
-      if (submitBtn) {
-        if (isExpired) {
-          submitBtn.disabled = true;
-          submitBtn.textContent = "Deadline Passed";
-          submitBtn.classList.remove("btn-primary");
-          submitBtn.classList.add("btn-outline");
-          submitBtn.title = `Submissions closed on ${deadlineDate.toLocaleString()}`;
+  }
+
+
+  // 8. Dynamic 3-Stage + Appeal Stepper
+    function renderStepper(sub) {
+      const stepper = document.getElementById("stepper");
+      if (!stepper) return;
+
+      const hasSubmitted = Boolean(sub);
+      const status = String(sub?.status || "").trim();
+      const remarks = String(sub?.remarks || "");
+      const verdict = String(sub?.rubric?.verdict || "");
+
+      // ── Check Evaluation Flags (AI + Faculty Completion) ──
+      // In DevArena, 'Evaluated' indicates AI grading has been vetted/finalized by faculty
+      const isBothEvaluated = status === "Evaluated" || status === "Re-Review Requested";
+
+      // ── Check Marks Awarded ──
+      const hasMarks = isBothEvaluated && (sub?.pointsEarned !== null && sub?.pointsEarned !== undefined);
+      const earnedPts = hasMarks ? sub.pointsEarned : null;
+
+      // ── Check Re-Evaluation / Appeal State ──
+      const isAppealed = status === "Re-Review Requested" ||
+        remarks.includes("Reason:") ||
+        verdict.includes("[Re-Review Upheld]") ||
+        remarks.includes("[Appeal Rejected]") ||
+        Boolean(sub?.rubric?.appealReason);
+
+      const isAppealPending = status === "Re-Review Requested";
+      const isAppealRejected = remarks.includes("[Appeal Rejected]") || status === "Re-Review Rejected" || verdict.includes("[Appeal Rejected]");
+      const isAppealAccepted = (isBothEvaluated && !isAppealPending && !isAppealRejected && (verdict.includes("[Re-Review Upheld]") || remarks.includes("Reason:")));
+
+      // ── Stage 1: Submission ──
+      const s1Class = hasSubmitted ? "completed" : "active";
+      const s1Desc = hasSubmitted
+        ? `Submitted on ${sub.submittedAt ? sub.submittedAt.slice(0, 10) : 'Recent'}`
+        : "Code, inputs & reflection prepared";
+
+      // ── Stage 2: Evaluated (Both AI & Faculty) ──
+      let s2Class = "";
+      let s2Desc = "Awaiting evaluation by AI & Faculty";
+      if (hasSubmitted) {
+        if (isBothEvaluated) {
+          s2Class = "completed";
+          s2Desc = "Verified by AI Rubric & Faculty Mentor";
         } else {
-          submitBtn.disabled = false;
-          submitBtn.textContent = sub ? "Resubmit Solution & Reflection" : "Submit Solution & Reflection";
-          submitBtn.classList.add("btn-primary");
-          submitBtn.classList.remove("btn-outline");
-          submitBtn.title = "";
+          s2Class = "active";
+          s2Desc = "Pending review by Faculty Mentor";
         }
       }
+
+      // ── Stage 3: Marks Awarded ──
+      let s3Class = "";
+      let s3Desc = "Marks pending mentor finalization";
+      if (isBothEvaluated) {
+        if (hasMarks) {
+          s3Class = "completed";
+          s3Desc = `Awarded: ${earnedPts} / 10 Pts (Click to view report)`;
+        } else {
+          s3Class = "active";
+          s3Desc = "Grading calculation in progress";
+        }
+      }
+
+      // ── Dynamic Stage 4: Re-Evaluation (Only renders if appeal was initiated) ──
+      let stage4Html = "";
+      if (isAppealed) {
+        if (isAppealPending) {
+          stage4Html = `
+            <li class="active appeal-pending">
+              <div class="step-marker font-mono">4</div>
+              <div>
+                <div class="step-title" style="color: #f59e0b;">Re-Evaluation In Progress</div>
+                <div class="step-desc">Faculty mentor is reviewing your appeal.</div>
+              </div>
+            </li>
+          `;
+        } else if (isAppealRejected) {
+          stage4Html = `
+            <li class="rejected appeal-rejected" id="stepperAppealStep" style="cursor:pointer;">
+              <div class="step-marker font-mono" style="background:#ef4444; border-color:#ef4444; color:#fff;">✕</div>
+              <div>
+                <div class="step-title" style="color: #ef4444;">Faculty Rejected Re-Evaluation</div>
+                <div class="step-desc">Original marks upheld. Click to view feedback.</div>
+              </div>
+            </li>
+          `;
+        } else if (isAppealAccepted) {
+          stage4Html = `
+            <li class="completed appeal-accepted" id="stepperAppealStep" style="cursor:pointer;">
+              <div class="step-marker font-mono">✓</div>
+              <div>
+                <div class="step-title" style="color: #10b981;">Re-Evaluation Completed</div>
+                <div class="step-desc">Faculty accepted appeal and finalized marks.</div>
+              </div>
+            </li>
+          `;
+        }
+      }
+
+      stepper.innerHTML = `
+        <li class="${s1Class}">
+          <div class="step-marker font-mono">1</div>
+          <div>
+            <div class="step-title">Submission</div>
+            <div class="step-desc">${s1Desc}</div>
+          </div>
+        </li>
+        <li class="${s2Class}">
+          <div class="step-marker font-mono">2</div>
+          <div>
+            <div class="step-title">Evaluated</div>
+            <div class="step-desc">${s2Desc}</div>
+          </div>
+        </li>
+        <li class="${s3Class}" style="${hasMarks ? 'cursor:pointer;' : ''}" id="stepperGradeStep">
+          <div class="step-marker font-mono">3</div>
+          <div>
+            <div class="step-title">Marks Awarded</div>
+            <div class="step-desc">${s3Desc}</div>
+          </div>
+        </li>
+        ${stage4Html}
+      `;
+
+      // Click listeners to open evaluation report
+      if (hasMarks) {
+        document.getElementById("stepperGradeStep")?.addEventListener("click", () => {
+          if (activeChallenge) openStudentReportModal(activeChallenge.id);
+        });
+      }
+
+      if (document.getElementById("stepperAppealStep")) {
+        document.getElementById("stepperAppealStep")?.addEventListener("click", () => {
+          if (activeChallenge) openStudentReportModal(activeChallenge.id);
+        });
+      }
     }
-  }
-
-  // 8. Stepper Progress Indicator
-  function renderStepper(sub) {
-    const stepper = document.getElementById("stepper");
-    if (!stepper) return;
-    const stage = sub ? sub.status : "Not Started";
-
-    stepper.innerHTML = `
-      <li class="${sub ? 'completed' : 'active'}">
-        <div class="step-marker">1</div>
-        <div>
-          <div class="step-title">Solution Drafted</div>
-          <div class="step-desc">Code, test cases &amp; reflection prepared</div>
-        </div>
-      </li>
-      <li class="${sub ? (stage === 'Evaluated' ? 'completed' : 'active') : ''}">
-        <div class="step-marker">2</div>
-        <div>
-          <div class="step-title">Automated &amp; Mentor Review</div>
-          <div class="step-desc">${stage === 'Submitted' ? 'Under Review' : (stage === 'Re-Review Requested' ? 'Re-Evaluation Queued' : 'Pending submission')}</div>
-        </div>
-      </li>
-      <li class="${stage === 'Evaluated' ? 'completed' : ''}" style="${stage === 'Evaluated' ? 'cursor:pointer;' : ''}" id="stepperGradeStep">
-        <div class="step-marker">3</div>
-        <div>
-          <div class="step-title">Graded &amp; Finalized</div>
-          <div class="step-desc">${stage === 'Evaluated' ? `Awarded: ${sub.pointsEarned} pts (Click for report)` : 'Awaiting grading'}</div>
-        </div>
-      </li>
-    `;
-
-    if (stage === "Evaluated") {
-      document.getElementById("stepperGradeStep")?.addEventListener("click", () => {
-        if (activeChallenge) openStudentReportModal(activeChallenge.id);
-      });
-    }
-  }
 
   // 9. Render Configured Sample Cases as Read-Only Reference Cards
   function renderSampleCasesDisplay(tests) {

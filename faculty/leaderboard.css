@@ -1,5 +1,6 @@
 /* ==========================================================================
    SRM DevArena — Faculty Leaderboard Stylesheet (faculty/leaderboard.css)
+   Calm Aesthetic Pastel Blue · Full Light & Dark Theme Parity
    ========================================================================== */
 
 .leaderboard-layout {
@@ -25,6 +26,7 @@
   font-size: 1.85rem;
   margin: 0 0 4px;
   color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .page-desc {
@@ -40,25 +42,81 @@
   flex-wrap: wrap;
 }
 
+/* Search input */
 #leaderboardSearchInput {
   height: 42px;
   width: 240px;
   padding: 0 14px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 1.5px solid var(--border, #b8d0f5);
+  background: var(--surface, #ffffff);
   color: var(--text);
   font-size: 0.86rem;
   outline: none;
   transition: all var(--transition-fast);
+  font-family: var(--font-body);
 }
 
 #leaderboardSearchInput:focus {
-  border-color: var(--focus-ring);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+  border-color: var(--accent, #3b7dd8);
+  box-shadow: 0 0 0 3px var(--accent-tint, #dbeafe);
 }
 
-/* Metric Cards */
+:root[data-theme="dark"] #leaderboardSearchInput {
+  background: var(--surface-sunken, #080d1a);
+  border-color: var(--border, #1e3054);
+  color: var(--text, #e2eaff);
+}
+
+:root[data-theme="dark"] #leaderboardSearchInput:focus {
+  border-color: var(--accent, #5b9cf8);
+  box-shadow: 0 0 0 3px var(--accent-tint, rgba(91,156,248,0.14));
+}
+
+#leaderboardSearchInput::placeholder {
+  color: var(--text-faint, #7a9acc);
+}
+
+/* Toolbar filter select */
+.toolbar-select {
+  height: 42px;
+  padding: 0 36px 0 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border, #b8d0f5);
+  background: var(--surface, #ffffff);
+  color: var(--text);
+  font-size: 0.86rem;
+  font-family: var(--font-body);
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b7dd8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 12px) center;
+  background-size: 14px 14px;
+  transition: all var(--transition-fast);
+}
+
+.toolbar-select:focus {
+  border-color: var(--accent, #3b7dd8);
+  box-shadow: 0 0 0 3px var(--accent-tint, #dbeafe);
+}
+
+:root[data-theme="dark"] .toolbar-select {
+  background-color: var(--surface-sunken, #080d1a);
+  border-color: var(--border, #1e3054);
+  color: var(--text, #e2eaff);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b9cf8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark"] .toolbar-select:focus {
+  border-color: var(--accent, #5b9cf8);
+  box-shadow: 0 0 0 3px var(--accent-tint, rgba(91,156,248,0.14));
+}
+
+/* Metric Summary Cards */
 .summary-strip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -69,19 +127,62 @@
 .summary-strip .stat-card {
   padding: 18px 22px;
   border-radius: var(--radius-lg);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #b8d0f5);
   box-shadow: var(--shadow-card);
+  transition: all var(--transition-fast);
 }
 
-/* Standings Card & Table Alignment */
+.summary-strip .stat-card:hover {
+  border-color: var(--accent, #3b7dd8);
+  box-shadow: 0 4px 16px rgba(59,125,216,0.15);
+}
+
+:root[data-theme="dark"] .summary-strip .stat-card {
+  background: var(--surface, #0f1629);
+  border-color: var(--border, #1e3054);
+}
+
+:root[data-theme="dark"] .summary-strip .stat-card:hover {
+  border-color: var(--accent, #5b9cf8);
+}
+
+/* Stat card internals */
+.stat-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #3a5282);
+  margin-bottom: 8px;
+  display: block;
+}
+
+:root[data-theme="dark"] .stat-label { color: var(--text-muted, #7e9ad4); }
+
+.stat-value {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--accent, #3b7dd8);
+  line-height: 1;
+}
+
+:root[data-theme="dark"] .stat-value { color: var(--accent, #5b9cf8); }
+
+/* Standings Card & Table */
 .standings-card {
   width: 100%;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #b8d0f5);
   box-shadow: var(--shadow-card);
+}
+
+:root[data-theme="dark"] .standings-card {
+  background: var(--surface, #0f1629);
+  border-color: var(--border, #1e3054);
 }
 
 .standings-card__header {
@@ -89,13 +190,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-alt);
+  border-bottom: 1px solid var(--border, #b8d0f5);
+  background: var(--surface-alt, #e8f0fe);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+:root[data-theme="dark"] .standings-card__header {
+  background: var(--surface-sunken, #080d1a);
+  border-bottom-color: var(--border, #1e3054);
 }
 
 .standings-card__header h2 {
   font-size: 1.15rem;
   margin: 0;
+  color: var(--text);
 }
 
 .table-responsive {
@@ -112,27 +221,45 @@
 }
 
 .faculty-rank-table th {
-  background: var(--surface-alt);
+  background: var(--surface-alt, #e8f0fe);
   padding: 14px 20px;
   font-size: 0.74rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
-  border-bottom: 2px solid var(--border);
+  color: var(--text-muted, #3a5282);
+  border-bottom: 2px solid var(--border, #b8d0f5);
   font-weight: 700;
   white-space: nowrap;
+  text-align: left;
+}
+
+:root[data-theme="dark"] .faculty-rank-table th {
+  background: var(--surface-sunken, #080d1a);
+  color: var(--text-muted, #7e9ad4);
+  border-bottom-color: var(--border, #1e3054);
 }
 
 .faculty-rank-table td {
   padding: 15px 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border, #b8d0f5);
   vertical-align: middle;
+  color: var(--text, #0d1b3e);
+}
+
+:root[data-theme="dark"] .faculty-rank-table td {
+  border-bottom-color: var(--border, #1e3054);
+  color: var(--text, #e2eaff);
 }
 
 .faculty-rank-table tr:hover td {
-  background: var(--surface-sunken);
+  background: var(--surface-alt, #e8f0fe);
 }
 
+:root[data-theme="dark"] .faculty-rank-table tr:hover td {
+  background: var(--surface-alt, #0d1424);
+}
+
+/* Table cell helpers */
 .student-regno {
   font-family: var(--font-mono);
   font-weight: 700;
@@ -146,47 +273,72 @@
   margin-top: 2px;
 }
 
+/* Track badge — accent tinted */
 .track-badge {
   display: inline-block;
-  background: var(--surface-sunken);
-  border: 1px solid var(--border);
-  padding: 3px 8px;
+  background: var(--accent-tint, #dbeafe);
+  border: 1px solid var(--border, #b8d0f5);
+  padding: 3px 9px;
   border-radius: 6px;
   font-size: 0.78rem;
   font-family: var(--font-mono);
-  color: var(--text);
+  font-weight: 600;
+  color: var(--accent, #3b7dd8);
+}
+
+:root[data-theme="dark"] .track-badge {
+  background: var(--accent-tint, rgba(91,156,248,0.14));
+  border-color: var(--border, #1e3054);
+  color: var(--accent, #5b9cf8);
 }
 
 .raw-points-val {
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 1.05rem;
-  color: #2563eb;
+  color: var(--accent, #3b7dd8);
 }
 
 :root[data-theme="dark"] .raw-points-val {
-  color: #38bdf8;
+  color: var(--accent, #5b9cf8);
 }
 
 .converted-marks-val {
   font-family: var(--font-mono);
   color: var(--text-muted);
   font-size: 0.9rem;
+  font-weight: 600;
 }
+
+/* Medals */
+.medal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.medal-gold   { background: rgba(234,179,8,0.18);  color: #b45309; border: 1px solid #fcd34d; }
+.medal-silver { background: rgba(148,163,184,0.18); color: #475569; border: 1px solid #cbd5e1; }
+.medal-bronze { background: rgba(217,119,6,0.18);  color: #9a3412; border: 1px solid #d97706; }
+
+:root[data-theme="dark"] .medal-gold   { color: #fcd34d; border-color: #b45309; }
+:root[data-theme="dark"] .medal-silver { color: #94a3b8; border-color: #64748b; }
+:root[data-theme="dark"] .medal-bronze { color: #fb923c; border-color: #9a3412; }
 
 /* --------------------------------------------------------------------------
    RESPONSIVE BREAKPOINTS (LEADERBOARD)
    -------------------------------------------------------------------------- */
 @media (max-width: 980px) {
-  .summary-strip {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .summary-strip { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
-  .leaderboard-layout {
-    padding: 16px 14px 40px;
-  }
+  .leaderboard-layout { padding: 16px 14px 40px; }
 
   .leaderboard-head {
     flex-direction: column;
@@ -200,11 +352,100 @@
     align-items: stretch;
   }
 
-  #leaderboardSearchInput {
+  #leaderboardSearchInput,
+  .toolbar-select {
     width: 100%;
   }
 
-  .summary-strip {
-    grid-template-columns: 1fr;
+  .summary-strip { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================================
+   FACULTY LEADERBOARD — Responsive Media Queries
+   ========================================================================== */
+
+/* ── Tablet landscape (≤1100px): 3-col summary strip ── */
+@media (max-width: 1100px) {
+  .leaderboard-layout { padding: 20px 20px 50px; }
+
+  .summary-strip { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+
+/* ── Tablet portrait (≤900px) ── */
+@media (max-width: 900px) {
+  .leaderboard-layout { padding: 18px 16px 48px; gap: 16px; }
+
+  .leaderboard-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
+
+  .leaderboard-toolbar {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  #leaderboardSearchInput { width: 100%; }
+  .toolbar-select { width: 100%; }
+
+  .summary-strip { gap: 10px; }
+
+  .standings-card__header { flex-wrap: wrap; gap: 10px; padding: 14px 18px; }
+}
+
+/* ── Tablet small / large phone (≤768px) ── */
+@media (max-width: 768px) {
+  .leaderboard-layout { padding: 14px 12px 44px; gap: 14px; }
+
+  .page-title { font-size: 1.55rem; }
+  .page-desc  { font-size: 0.84rem; }
+
+  .summary-strip { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+  .summary-strip .stat-card { padding: 14px 16px; border-radius: var(--radius-md); }
+  .stat-value { font-size: 1.4rem; }
+  .stat-label { font-size: 0.7rem; }
+
+  .standings-card { border-radius: var(--radius-md); }
+  .standings-card__header { padding: 12px 14px; }
+  .standings-card__header h2 { font-size: 1rem; }
+
+  .faculty-rank-table { font-size: 0.82rem; min-width: 640px; }
+  .faculty-rank-table th { padding: 10px 12px; font-size: 0.7rem; }
+  .faculty-rank-table td { padding: 11px 12px; }
+}
+
+/* ── Large phone (≤480px) ── */
+@media (max-width: 480px) {
+  .leaderboard-layout { padding: 10px 10px 40px; gap: 12px; }
+
+  .page-title { font-size: 1.3rem; }
+
+  /* Summary strip → 2 columns on phone */
+  .summary-strip { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .summary-strip .stat-card { padding: 12px 14px; }
+  .stat-value { font-size: 1.25rem; }
+
+  #leaderboardSearchInput { font-size: 0.83rem; }
+
+  .faculty-rank-table { min-width: 560px; font-size: 0.78rem; }
+  .faculty-rank-table th { padding: 9px 10px; font-size: 0.68rem; }
+  .faculty-rank-table td { padding: 9px 10px; }
+
+  .track-badge { font-size: 0.72rem; padding: 2px 7px; }
+  .medal-badge { width: 22px; height: 22px; font-size: 0.72rem; }
+}
+
+/* ── Small phone (≤360px) ── */
+@media (max-width: 360px) {
+  .leaderboard-layout { padding: 8px 8px 36px; }
+  .page-title { font-size: 1.15rem; }
+
+  /* Summary strip → single column on tiny phones */
+  .summary-strip { grid-template-columns: 1fr; }
+
+  .leaderboard-toolbar { flex-direction: column; }
+  .faculty-rank-table { min-width: 500px; }
 }
