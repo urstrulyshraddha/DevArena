@@ -761,41 +761,45 @@ async function boot() {
   });
 
   // ── Open Dedicated Faculty Gradebook Spreadsheet ──
-  const openGradebookBtn = document.getElementById("openGradebookBtn");
-  openGradebookBtn?.addEventListener("click", async () => {
-    openGradebookBtn.disabled = true;
-    openGradebookBtn.textContent = "Opening...";
+    const openGradebookBtn = document.getElementById("openGradebookBtn");
+    openGradebookBtn?.addEventListener("click", async () => {
+      openGradebookBtn.disabled = true;
+      openGradebookBtn.textContent = "Fetching Sheet Link...";
 
-    // Open blank window synchronously on click to bypass modern browser popup blockers
-    const sheetTab = window.open("", "_blank");
+      try {
+        const res = await API.getFacultyGradebook({
+          facultyId: activeFaculty.id || session.facultyId || "yasir",
+          email: session.email,
+          name: session.name,
+          trackId: activeTrack.id,
+          trackName: activeTrack.name,
+          section: activeTrack.section || "A"
+        });
 
-    try {
-      const res = await API.getFacultyGradebook({
-        facultyId: activeFaculty.id || session.facultyId || "yasir",
-        email: session.email,
-        name: session.name,
-        trackId: activeTrack.id,
-        trackName: activeTrack.name,
-        section: activeTrack.section || "A"
-      });
+        console.log("[DevArena] Gradebook response:", res);
 
-      if (res && res.success && res.gradebookUrl) {
-        sheetTab.location.href = res.gradebookUrl;
-      } else {
-        sheetTab.close();
-        alert(res?.error || "Unable to retrieve gradebook sheet link.");
+        if (res && res.success && res.gradebookUrl) {
+          // Direct anchor navigation avoids about:blank hangs
+          const a = document.createElement("a");
+          a.href = res.gradebookUrl;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        } else {
+          alert("Server responded: " + (res?.error || "Could not generate or find gradebook URL."));
+        }
+      } catch (err) {
+        alert("Failed to connect to backend: " + err.message);
+      } finally {
+        openGradebookBtn.disabled = false;
+        openGradebookBtn.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open Gradebook Sheet
+        `;
       }
-    } catch (err) {
-      sheetTab.close();
-      alert("Error opening gradebook: " + err.message);
-    } finally {
-      openGradebookBtn.disabled = false;
-      openGradebookBtn.innerHTML = `
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Open Gradebook Sheet
-      `;
-    }
-  });
+    });
 
   // 9. Automated AI Batch Review Trigger
   document.getElementById("triggerAiReviewBtn")?.addEventListener("click", async () => {
