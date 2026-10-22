@@ -702,7 +702,7 @@ async function boot() {
     const days = document.getElementById("newTrackDays")?.value.trim() || "14";
 
     if (!name) {
-      toast("Track Name is required.");
+      alert("Track Name is required.");
       return;
     }
 
@@ -723,7 +723,8 @@ async function boot() {
           year,
           section,
           challengeDays: `${days} Days`,
-          facultyId: activeFaculty.id
+          facultyId: activeFaculty.id || session.facultyId || "yasir",
+          facultyEmail: session.email
         }
       });
 
@@ -734,7 +735,7 @@ async function boot() {
           year,
           section,
           challengeDays: `${days} Days`,
-          facultyId: activeFaculty.id
+          facultyId: activeFaculty.id || session.facultyId || "yasir"
         };
 
         tracks.push(newTrack);
@@ -743,14 +744,14 @@ async function boot() {
         setupTrackDropdown();
         createTrackModal?.setAttribute("hidden", "");
         createTrackForm.reset();
-        toast(`Track "${name} · ${section}" created successfully!`);
+        alert(`✅ Track "${name} · ${section}" created successfully!`);
 
         await loadData();
       } else {
-        toast("Failed: " + (res?.error || "Unable to create track."));
+        alert("Failed to create track: " + (res?.error || "Unable to create track."));
       }
     } catch (err) {
-      toast("Failed to create track: " + err.message);
+      alert("Failed to create track: " + err.message);
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
@@ -765,9 +766,12 @@ async function boot() {
     openGradebookBtn.disabled = true;
     openGradebookBtn.textContent = "Opening...";
 
+    // Open blank window synchronously on click to bypass modern browser popup blockers
+    const sheetTab = window.open("", "_blank");
+
     try {
       const res = await API.getFacultyGradebook({
-        facultyId: activeFaculty.id,
+        facultyId: activeFaculty.id || session.facultyId || "yasir",
         email: session.email,
         name: session.name,
         trackId: activeTrack.id,
@@ -776,12 +780,14 @@ async function boot() {
       });
 
       if (res && res.success && res.gradebookUrl) {
-        window.open(res.gradebookUrl, "_blank");
+        sheetTab.location.href = res.gradebookUrl;
       } else {
-        toast("Unable to retrieve gradebook sheet link.");
+        sheetTab.close();
+        alert(res?.error || "Unable to retrieve gradebook sheet link.");
       }
     } catch (err) {
-      toast("Error opening gradebook: " + err.message);
+      sheetTab.close();
+      alert("Error opening gradebook: " + err.message);
     } finally {
       openGradebookBtn.disabled = false;
       openGradebookBtn.innerHTML = `
@@ -902,18 +908,18 @@ async function boot() {
       });
 
       if (res && res.success) {
-              toast("Your feedback has been sent to Admin and will be resolved accordingly.");
-              alert("✅ Your feedback has been sent to Admin and will be resolved accordingly.\nTicket ID: " + (res.ticketId || "Logged"));
-              hideFacultyModal();
-              document.getElementById("facultyProblemTitleInput").value = "";
-              document.getElementById("facultyProblemTypeInput").value = "";
-              document.getElementById("facultyProblemDescArea").value = "";
-              if (facultyFeedbackImgNameLabel) facultyFeedbackImgNameLabel.textContent = "No screenshot selected";
-              facultyImageBase64 = null;
-            } else {
-              toast("Failed: " + (res?.error || "Server error"));
-              alert("Failed to submit feedback: " + (res?.error || "Unknown server response"));
-            }
+        toast("Your feedback has been sent to Admin and will be resolved accordingly.");
+        alert("✅ Your feedback has been sent to Admin and will be resolved accordingly.\nTicket ID: " + (res.ticketId || "Logged"));
+        hideFacultyModal();
+        document.getElementById("facultyProblemTitleInput").value = "";
+        document.getElementById("facultyProblemTypeInput").value = "";
+        document.getElementById("facultyProblemDescArea").value = "";
+        if (facultyFeedbackImgNameLabel) facultyFeedbackImgNameLabel.textContent = "No screenshot selected";
+        facultyImageBase64 = null;
+      } else {
+        toast("Failed: " + (res?.error || "Server error"));
+        alert("Failed to submit feedback: " + (res?.error || "Unknown server response"));
+      }
     } catch (err) {
       toast("Error: " + err.message);
     } finally {
